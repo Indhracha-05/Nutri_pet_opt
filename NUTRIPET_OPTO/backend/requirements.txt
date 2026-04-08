@@ -1,0 +1,15 @@
+fastapi>=0.115.0
+uvicorn>=0.30.6
+scikit-learn>=1.5.2
+pandas>=2.2.3
+networkx>=3.4.2
+joblib>=1.4.2
+shap>=0.46.0
+xgboost>=2.1.1
+sqlalchemy>=2.0.35
+aiosqlite>=0.20.0
+pydantic>=2.9.2
+matplotlib>=3.9.2
+seaborn>=0.13.2
+numpy>=1.26.4
+python-multipart>=0.0.12

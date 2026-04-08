@@ -1,0 +1,83 @@
+species_name,food_name,toxic_compound,severity
+Dog,Chocolate (Dark),Theobromine,lethal
+Dog,Chocolate (Milk),Theobromine,high
+Dog,Grapes,Unknown nephrotoxin,lethal
+Dog,Raisins,Unknown nephrotoxin,lethal
+Dog,Onion (Raw),N-propyl disulfide,high
+Dog,Garlic,Thiosulfate,moderate
+Dog,Xylitol,Xylitol (insulin release),lethal
+Dog,Macadamia Nut,Unknown neurotoxin,high
+Dog,Alcohol (Ethanol),Ethanol,lethal
+Dog,Caffeine Extract,Caffeine / Methylxanthine,high
+Dog,Avocado,Persin,moderate
+Dog,Rhubarb,Oxalic acid,moderate
+Dog,Raw Potato,Solanine,moderate
+Cat,Chocolate (Dark),Theobromine,lethal
+Cat,Chocolate (Milk),Theobromine,high
+Cat,Onion (Raw),N-propyl disulfide,lethal
+Cat,Garlic,Thiosulfate,high
+Cat,Grapes,Unknown nephrotoxin,high
+Cat,Raisins,Unknown nephrotoxin,high
+Cat,Lily (Plant),Unknown nephrotoxin,lethal
+Cat,Caffeine Extract,Caffeine / Methylxanthine,high
+Cat,Alcohol (Ethanol),Ethanol,lethal
+Cat,Avocado,Persin,moderate
+Cat,Xylitol,Xylitol (insulin release),high
+Cat,Rhubarb,Oxalic acid,moderate
+Cat,Raw Potato,Solanine,moderate
+Rabbit,Avocado,Persin,lethal
+Rabbit,Chocolate (Dark),Theobromine,lethal
+Rabbit,Chocolate (Milk),Theobromine,high
+Rabbit,Onion (Raw),N-propyl disulfide,high
+Rabbit,Garlic,Thiosulfate,high
+Rabbit,Iceberg Lettuce,Lactucarium,moderate
+Rabbit,Raw Potato,Solanine,high
+Rabbit,Rhubarb,Oxalic acid,high
+Rabbit,Caffeine Extract,Caffeine,high
+Rabbit,Alcohol (Ethanol),Ethanol,lethal
+Hamster,Chocolate (Dark),Theobromine,lethal
+Hamster,Chocolate (Milk),Theobromine,high
+Hamster,Garlic,Thiosulfate,high
+Hamster,Onion (Raw),N-propyl disulfide,high
+Hamster,Almonds,Cyanide traces,moderate
+Hamster,Orange,Citric acid (excess),moderate
+Hamster,Raw Potato,Solanine,high
+Hamster,Caffeine Extract,Caffeine,high
+Hamster,Alcohol (Ethanol),Ethanol,lethal
+Bird,Avocado,Persin,lethal
+Bird,Chocolate (Dark),Theobromine,lethal
+Bird,Chocolate (Milk),Theobromine,high
+Bird,Caffeine Extract,Caffeine,lethal
+Bird,Onion (Raw),N-propyl disulfide,high
+Bird,Garlic,Thiosulfate,high
+Bird,Apple Seeds,Amygdalin (cyanide),high
+Bird,Alcohol (Ethanol),Ethanol,lethal
+Bird,Xylitol,Xylitol,high
+Fish,Bread (White),Yeast / Gluten (indigestible),moderate
+Fish,Chocolate (Dark),Theobromine,high
+Fish,Chocolate (Milk),Theobromine,moderate
+Fish,Garlic,Thiosulfate,moderate
+Fish,Citrus Peel,Citric acid,moderate
+Fish,Mammal Meat (Generic),High ammonia protein,moderate
+Fish,Alcohol (Ethanol),Ethanol,lethal
+Fish,Caffeine Extract,Caffeine,high
+Guinea Pig,Raw Potato,Solanine,high
+Guinea Pig,Onion (Raw),N-propyl disulfide,high
+Guinea Pig,Garlic,Thiosulfate,high
+Guinea Pig,Chocolate (Dark),Theobromine,lethal
+Guinea Pig,Chocolate (Milk),Theobromine,high
+Guinea Pig,Milk (Whole),Lactose (intolerance),moderate
+Guinea Pig,Iceberg Lettuce,Lactucarium,moderate
+Guinea Pig,Avocado,Persin,lethal
+Guinea Pig,Rhubarb,Oxalic acid,high
+Guinea Pig,Alcohol (Ethanol),Ethanol,lethal
+Guinea Pig,Caffeine Extract,Caffeine,high
+Turtle,Avocado,Persin,high
+Turtle,Milk (Whole),Lactose (intolerance),moderate
+Turtle,Chocolate (Dark),Theobromine,lethal
+Turtle,Chocolate (Milk),Theobromine,high
+Turtle,Rhubarb,Oxalic acid,high
+Turtle,Onion (Raw),N-propyl disulfide,moderate
+Turtle,Garlic,Thiosulfate,moderate
+Turtle,Alcohol (Ethanol),Ethanol,lethal
+Turtle,Caffeine Extract,Caffeine,high

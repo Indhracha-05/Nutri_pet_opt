@@ -1,0 +1,9 @@
+name,protein_requirement,fat_tolerance,carb_tolerance,omega3_requirement,omega6_requirement,digestive_type,known_sensitivities
+Dog,18.0,25.0,50.0,110.0,1100.0,omnivore,"chocolate,grapes,onions,garlic,xylitol,macadamia nuts,alcohol,caffeine"
+Cat,26.0,20.0,15.0,50.0,550.0,carnivore,"onions,garlic,chocolate,grapes,lilies,caffeine,alcohol,raw fish"
+Rabbit,12.0,5.0,65.0,30.0,200.0,herbivore,"avocado,chocolate,onions,garlic,iceberg lettuce,potatoes,rhubarb"
+Hamster,16.0,8.0,55.0,20.0,150.0,omnivore,"chocolate,garlic,onions,almonds,citrus fruits,raw potatoes"
+Bird,14.0,10.0,60.0,40.0,300.0,omnivore,"avocado,chocolate,caffeine,onions,garlic,apple seeds,alcohol"
+Fish,35.0,15.0,10.0,200.0,100.0,carnivore,"bread,chocolate,garlic,citrus,mammal meat"
+Guinea Pig,10.0,4.0,70.0,25.0,180.0,herbivore,"potatoes,onions,garlic,chocolate,dairy,iceberg lettuce,avocado"
+Turtle,15.0,6.0,55.0,35.0,250.0,omnivore,"avocado,dairy,chocolate,rhubarb,onions,garlic"

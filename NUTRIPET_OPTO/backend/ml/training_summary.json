@@ -1,0 +1,42 @@
+{
+  "classification": {
+    "Random Forest": {
+      "accuracy": 0.7028301886792453,
+      "f1_macro": 0.6463276836158192
+    },
+    "XGBoost": {
+      "accuracy": 0.7075471698113207,
+      "f1_macro": 0.6662979313627674
+    },
+    "Logistic Regression": {
+      "accuracy": 0.660377358490566,
+      "f1_macro": 0.5522724825406615
+    }
+  },
+  "feature_names": [
+    "toxin_flag",
+    "protein_match",
+    "fat_match",
+    "carb_tolerance",
+    "sugar_risk",
+    "omega_balance",
+    "bioavailability_match",
+    "glycemic_risk",
+    "digestibility_index",
+    "fiber_compatibility",
+    "nutrient_match_ratio",
+    "omega_ratio",
+    "cost_nutrition_efficiency",
+    "sugar_overload_risk",
+    "macro_balance_score",
+    "species_Bird",
+    "species_Cat",
+    "species_Dog",
+    "species_Fish",
+    "species_Guinea Pig",
+    "species_Hamster",
+    "species_Rabbit",
+    "species_Turtle"
+  ],
+  "dataset_size": 1056
+}
