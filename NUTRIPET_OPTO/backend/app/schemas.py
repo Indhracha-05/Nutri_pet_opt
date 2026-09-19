@@ -79,3 +79,85 @@ class AnalysisResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# --- Meal Planner Models ---
+
+class MealPlanRequest(BaseModel):
+    species_name: str = Field(..., description="Target pet species (e.g., 'Dog', 'Cat', 'Rabbit')")
+    pet_weight_kg: float = Field(..., gt=0, description="Pet body weight in kg (e.g., 10.0)")
+    activity_level: Optional[str] = Field("normal", description="inactive, normal, active, or working")
+    target_calories_override: Optional[float] = Field(None, description="Optional manual daily calorie target")
+    available_ingredients: List[str] = Field(..., min_length=1, description="List of raw food ingredients available to the user")
+    days: Optional[int] = Field(1, ge=1, le=7, description="Number of days to plan (1 to 7)")
+    meals_per_day: Optional[int] = Field(2, ge=1, le=3, description="Number of meals per day (1, 2, or 3)")
+
+
+class IngredientPortion(BaseModel):
+    food_id: Optional[int] = None
+    food_name: str
+    category: str
+    grams: float
+    calories: float
+    protein_g: float
+    fat_g: float
+    carbs_g: float
+    cost_usd: float
+    percent_of_meal: float
+
+
+class DayMealPortion(BaseModel):
+    food_name: str
+    category: str
+    grams: float
+    calories: float
+    protein_g: float
+    fat_g: float
+    carbs_g: float
+
+
+class DayMeal(BaseModel):
+    meal_name: str
+    ratio: float
+    total_grams: float
+    total_calories: float
+    portions: List[DayMealPortion]
+
+
+class DayPlan(BaseModel):
+    day_number: int
+    total_grams: float
+    total_calories: float
+    macro_summary: Dict[str, float]
+    ingredients: List[IngredientPortion]
+    meals: List[DayMeal]
+
+
+class GroceryItem(BaseModel):
+    food_name: str
+    category: str
+    total_grams: float
+    total_cost_usd: float
+
+
+class ExcludedToxicFood(BaseModel):
+    food_name: str
+    toxic_compound: str
+    severity: str
+
+
+class MealPlanResponse(BaseModel):
+    species_name: str
+    pet_weight_kg: float
+    activity_level: str
+    rer_kcal: float
+    mer_kcal: float
+    daily_target_calories: float
+    days_planned: int
+    meals_per_day: int
+    warnings: List[str]
+    excluded_toxic_foods: List[ExcludedToxicFood]
+    daily_plans: List[DayPlan]
+    grocery_list: List[GroceryItem]
+    total_estimated_cost_usd: float
+

@@ -1,4 +1,5 @@
 @echo off
+set PYTHONUTF8=1
 echo ==========================================
 echo   Setting up and Starting NutriPet_Opto
 echo ==========================================

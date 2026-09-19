@@ -8,7 +8,7 @@ def create_report():
     doc = Document()
     
     # Title Page
-    title = doc.add_heading('NutriPet_Opto: AI-Powered Pet Food Analysis System', 0)
+    title = doc.add_heading('NutriPet_Opto: Pet Food Analysis System', 0)
     title.alignment = WD_ALIGN_PARAGRAPH.CENTER
     
     subtitle = doc.add_paragraph('Technical Report')

@@ -42,7 +42,7 @@ def seed_species(session):
         session.add(species)
         count += 1
     session.commit()
-    print(f"  ✅ Seeded {count} species (total: {session.query(Species).count()})")
+    print(f"  [OK] Seeded {count} species (total: {session.query(Species).count()})")
 
 
 def seed_foods(session):
@@ -75,7 +75,7 @@ def seed_foods(session):
         session.add(food)
         count += 1
     session.commit()
-    print(f"  ✅ Seeded {count} foods (total: {session.query(Food).count()})")
+    print(f"  [OK] Seeded {count} foods (total: {session.query(Food).count()})")
 
 
 def seed_toxicity(session):
@@ -88,10 +88,10 @@ def seed_toxicity(session):
         species = session.query(Species).filter_by(name=row["species_name"]).first()
         food = session.query(Food).filter_by(name=row["food_name"]).first()
         if not species:
-            print(f"  ⚠️  Species not found: {row['species_name']}")
+            print(f"  [WARN] Species not found: {row['species_name']}")
             continue
         if not food:
-            print(f"  ⚠️  Food not found: {row['food_name']}")
+            print(f"  [WARN] Food not found: {row['food_name']}")
             continue
 
         # Check for duplicate
@@ -112,28 +112,28 @@ def seed_toxicity(session):
         session.add(toxicity)
         count += 1
     session.commit()
-    print(f"  ✅ Seeded {count} toxicity records (total: {session.query(Toxicity).count()})")
+    print(f"  [OK] Seeded {count} toxicity records (total: {session.query(Toxicity).count()})")
 
 
 def main():
-    print("🐾 NutriPet_Opto Database Seeding")
+    print("NutriPet_Opto Database Seeding")
     print("=" * 40)
 
     # Create tables
-    print("\n📦 Creating database tables...")
+    print("\n Creating database tables...")
     init_db()
-    print("  ✅ Tables created")
+    print("  [OK] Tables created")
 
     # Seed data
     session = SessionLocal()
     try:
-        print("\n🌱 Seeding species...")
+        print("\nSeed: Seeding species...")
         seed_species(session)
 
-        print("\n🌱 Seeding foods...")
+        print("\nSeed: Seeding foods...")
         seed_foods(session)
 
-        print("\n🌱 Seeding toxicity data...")
+        print("\nSeed: Seeding toxicity data...")
         seed_toxicity(session)
 
         # Summary
@@ -143,12 +143,12 @@ def main():
             + session.query(Toxicity).count()
         )
         print(f"\n{'=' * 40}")
-        print(f"📊 Total records in database: {total}")
+        print(f" Total records in database: {total}")
         print(f"   Species: {session.query(Species).count()}")
         print(f"   Foods:   {session.query(Food).count()}")
         print(f"   Toxic:   {session.query(Toxicity).count()}")
         print(f"{'=' * 40}")
-        print("✅ Database seeding complete!")
+        print("Database seeding complete!")
     finally:
         session.close()
 

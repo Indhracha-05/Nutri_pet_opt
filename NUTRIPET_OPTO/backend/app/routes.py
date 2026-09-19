@@ -20,8 +20,12 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 from .database import get_db
 from .models import Species, Food
-from .schemas import SpeciesRead, FoodRead, AnalysisRequest, AnalysisResponse, TopFactor, CategoryAnalysisRequest
+from .schemas import (
+    SpeciesRead, FoodRead, AnalysisRequest, AnalysisResponse, 
+    TopFactor, CategoryAnalysisRequest, MealPlanRequest, MealPlanResponse
+)
 from .knowledge_graph import build_graph, check_toxicity, extract_graph_features, graph_to_cytoscape_json
+from .planner import generate_plan
 from ml.explainability import explain
 from ml.generate_dataset import compute_caloric_density as compute_caloric_heuristic
 
@@ -237,3 +241,29 @@ def evaluate_food(request: AnalysisRequest, db: Session = Depends(get_db)):
     (Alias for /analyze to match rubric requirement: POST /evaluate)
     """
     return analyze_food(request, db)
+
+
+@router.post("/plan", response_model=MealPlanResponse, tags=["Meal Planner"])
+def create_meal_plan(request: MealPlanRequest, db: Session = Depends(get_db)):
+    """
+    Generate a day-wise meal plan with exact grams and calories per raw ingredient
+    based on pet species, body weight, activity level, and available ingredients.
+    """
+    try:
+        plan = generate_plan(
+            species_name=request.species_name,
+            weight_kg=request.pet_weight_kg,
+            activity_level=request.activity_level or "normal",
+            target_calories_override=request.target_calories_override,
+            available_ingredient_names=request.available_ingredients,
+            days=request.days or 1,
+            meals_per_day=request.meals_per_day or 2,
+            db=db,
+            graph=GRAPH
+        )
+        return plan
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate meal plan: {str(e)}")
+
