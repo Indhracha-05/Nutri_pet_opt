@@ -9,8 +9,8 @@ import MealPlanner from '../components/MealPlanner';
 const API_BASE = "http://localhost:8000";
 
 const TABS = [
-  { id: "analysis", label: "🔬 Food Safety & AI Grading", desc: "Single food & category analysis" },
-  { id: "planner", label: "📅 Smart Meal Planner", desc: "Day-wise raw ingredient planner" },
+  { id: "analysis", label: "Food Safety & AI Grading" },
+  { id: "planner", label: "Smart Meal Planner" },
 ];
 
 function AnalyzerPage() {
@@ -23,7 +23,6 @@ function AnalyzerPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch species once for both tabs
   useEffect(() => {
     axios.get(`${API_BASE}/species`).then(r => setSpecies(r.data)).catch(() => { });
   }, []);
@@ -63,71 +62,63 @@ function AnalyzerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-950 via-purple-950 to-gray-950 py-10 px-4">
-      {/* Ambient glows */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-purple-700/20 blur-3xl" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full bg-pink-700/15 blur-3xl" />
-      </div>
-
-      <div className="relative max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-3">
-          {/* Back button */}
-          <div className="flex justify-start mb-2">
+    <div className="min-h-screen bg-[#ffffff] text-[#17191c] flex flex-col justify-between selection:bg-[#fbe1d1] selection:text-[#5d2a1a]">
+      {/* Steep Navigation Bar */}
+      <header className="border-b border-[#ececec] bg-[#ffffff]">
+        <div className="max-w-[1200px] mx-auto px-8 py-6 flex items-center justify-between">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center gap-2 text-sm text-white/40 hover:text-white/80 transition-colors group px-3 py-1.5 rounded-lg hover:bg-white/5"
+              className="text-xs font-sans text-[#777b86] hover:text-[#17191c] transition-colors flex items-center gap-1"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="group-hover:-translate-x-0.5 transition-transform">
-                <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Back to Home
+              <span>←</span>
+              <span>Home</span>
             </button>
+            <div className="h-4 w-px bg-[#ececec]" />
+            <span className="font-serif text-xl text-[#17191c]">
+              NutriPet
+            </span>
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-pink-300 to-indigo-300 tracking-tight">
-            🐾 NutriPet_Opto
-          </h1>
-          <p className="text-lg text-white/50 max-w-2xl mx-auto">
-            Real-time nutritional compatibility &amp; toxicity analysis for your pet — powered by ML trained on veterinary guidelines.
-          </p>
-        </div>
-
-        {/* Navigation Tabs */}
-        <div className="flex justify-center">
-          <div className="flex gap-1 p-1.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
-            {TABS.map(tab => (
-              <button
-                key={tab.id}
-                id={`tab-${tab.id}`}
-                onClick={() => setActiveTab(tab.id)}
-                className={`relative px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 ${activeTab === tab.id
-                    ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg shadow-purple-900/40"
-                    : "text-white/50 hover:text-white/80 hover:bg-white/5"
+          {/* Pill Tab Switcher */}
+          <div className="flex items-center gap-2 bg-[#f2f2f3] p-1 rounded-full">
+            {TABS.map((tab) => {
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  id={`tab-${tab.id}`}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`px-5 py-2 text-xs font-sans rounded-full transition-all ${
+                    isActive
+                      ? "bg-[#17191c] text-[#ffffff]"
+                      : "text-[#777b86] hover:text-[#17191c]"
                   }`}
-              >
-                <span className="relative z-10">{tab.label}</span>
-                {activeTab === tab.id && (
-                  <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[9px] text-white/50 font-normal whitespace-nowrap">
-                    {tab.desc}
-                  </span>
-                )}
-              </button>
-            ))}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
         </div>
+      </header>
 
-        {/* Food Safety & AI Grading Tab */}
+      {/* Main Workspace */}
+      <main className="max-w-[1200px] mx-auto px-8 py-12 flex-1 w-full space-y-8">
         {activeTab === "analysis" && (
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 animate-fade-in">
-            {/* Left Column: Input */}
-            <div className="lg:col-span-4 space-y-5">
-              <div className="p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
-                <h2 className="text-lg font-bold text-white mb-5 flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-purple-600/30">🔬</span>
-                  New Analysis
-                </h2>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            {/* Left Column: Inputs */}
+            <div className="lg:col-span-4 space-y-6">
+              <div className="card-floating space-y-6">
+                <div>
+                  <span className="text-xs text-[#979799] block mb-1">
+                    Query Parameters
+                  </span>
+                  <h2 className="text-2xl font-serif text-[#17191c]">
+                    Dietary Evaluation
+                  </h2>
+                </div>
+
                 <InputForm
                   onAnalyze={handleAnalysis}
                   onCategoryAnalyze={handleCategoryAnalysis}
@@ -135,39 +126,42 @@ function AnalyzerPage() {
                 />
               </div>
 
-              <div className="p-4 rounded-xl bg-blue-900/20 border border-blue-500/20 text-xs text-blue-300/80 leading-relaxed">
-                <strong className="text-blue-300">⚠ Disclaimer:</strong> This tool uses AI models and public databases for educational purposes.
-                Always consult a veterinarian for professional dietary advice.
+              {/* Quiet Disclaimer Box */}
+              <div className="p-5 rounded-inputs bg-[#fafafb] border border-[#ececec] text-xs text-[#777b86] leading-relaxed space-y-1">
+                <p className="font-medium text-[#17191c]">Clinical Guidance Note</p>
+                <p>
+                  Assessments are computed using veterinary biochemistry heuristics and verified toxicity datasets. Informational only.
+                </p>
               </div>
             </div>
 
             {/* Right Column: Output */}
             <div className="lg:col-span-8">
               {isLoading && (
-                <div className="flex flex-col items-center justify-center h-72 space-y-5 text-white/50">
-                  <div className="relative">
-                    <div className="w-20 h-20 border-4 border-purple-800 border-t-purple-400 rounded-full animate-spin" />
-                    <div className="absolute inset-0 flex items-center justify-center text-2xl">🐾</div>
-                  </div>
-                  <p className="text-base font-medium animate-pulse">Running AI analysis...</p>
+                <div className="flex flex-col items-center justify-center min-h-[420px] rounded-cards bg-[#f2f2f3] space-y-4 text-[#777b86]">
+                  <div className="w-8 h-8 border-2 border-[#ececec] border-t-[#17191c] rounded-full animate-spin" />
+                  <p className="text-sm font-sans font-medium text-[#17191c]">
+                    Computing metabolic evaluation...
+                  </p>
                 </div>
               )}
 
               {error && (
-                <div className="bg-red-900/30 border border-red-500/40 text-red-300 px-6 py-4 rounded-xl flex items-start gap-3">
-                  <span className="text-red-400 text-xl mt-0.5">⚠</span>
-                  <div>
-                    <p className="font-bold text-red-200">Analysis Failed</p>
-                    <p className="text-sm mt-1">{error}</p>
-                  </div>
+                <div className="p-6 rounded-cards bg-[#fbe1d1] text-[#5d2a1a] space-y-1">
+                  <p className="font-serif font-bold text-base">Analysis Error</p>
+                  <p className="text-xs">{error}</p>
                 </div>
               )}
 
               {!isLoading && !error && !result && !categoryResult && (
-                <div className="flex flex-col items-center justify-center min-h-[400px] rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02] space-y-4 text-white/30">
-                  <div className="text-7xl opacity-60">🐾</div>
-                  <p className="text-lg font-medium">Select a pet and food to begin analysis</p>
-                  <p className="text-sm">Try the <span className="text-purple-400">Food Category</span> mode to compare multiple foods at once</p>
+                <div className="flex flex-col items-center justify-center min-h-[460px] rounded-cards bg-[#fafafb] border border-dashed border-[#ececec] p-12 text-center space-y-3">
+                  <div className="text-2xl text-[#a3a6af]">◈</div>
+                  <h3 className="text-xl font-serif text-[#17191c]">
+                    Awaiting Dietary Query
+                  </h3>
+                  <p className="text-sm text-[#777b86] max-w-md leading-relaxed">
+                    Select a pet species and food item on the left to review biological health grading, toxicity risks, and nutrient profiles.
+                  </p>
                 </div>
               )}
 
@@ -177,13 +171,21 @@ function AnalyzerPage() {
           </div>
         )}
 
-        {/* Smart Meal Planner Tab */}
+        {/* Tab 2: Smart Meal Planner */}
         {activeTab === "planner" && (
-          <div className="animate-fade-in">
+          <div>
             <MealPlanner species={species} />
           </div>
         )}
-      </div>
+      </main>
+
+      {/* Steep Footer */}
+      <footer className="border-t border-[#ececec] bg-[#ffffff] py-8 px-8">
+        <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-[#a3a6af] gap-2">
+          <span>NutriPet System</span>
+          <span>Steep Minimalist Editorial Style</span>
+        </div>
+      </footer>
     </div>
   );
 }

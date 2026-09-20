@@ -2,247 +2,200 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-gray-950 text-white antialiased;
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+@layer base {
+  :root {
+    --color-ink-black: #17191c;
+    --color-paper-white: #ffffff;
+    --color-mist-gray: #f2f2f3;
+    --color-fog-white: #fafafb;
+    --color-slate-gray: #777b86;
+    --color-ash-gray: #979799;
+    --color-smoke-gray: #a3a6af;
+    --color-blush-peach: #fbe1d1;
+    --color-sienna-brown: #5d2a1a;
+
+    --font-signifier: 'Source Serif 4', 'Signifier', Georgia, serif;
+    --font-sohne: 'Inter', 'Sohne', system-ui, -apple-system, sans-serif;
+  }
+
+  html {
+    background-color: #ffffff;
+    color: #17191c;
+    font-family: var(--font-sohne);
+  }
+
+  body {
+    background-color: #ffffff;
+    color: #17191c;
+    font-family: var(--font-sohne);
+    font-size: 17px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: var(--font-signifier);
+    font-weight: 400; /* Steep signature: serif whispers authority at regular 400 */
+    letter-spacing: -0.015em;
+  }
+
+  code, pre, .font-mono {
+    font-family: 'Source Code Pro', Consolas, monospace;
+  }
 }
 
-/* Scrollbar styling */
+/* Minimal Steep Scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.03);
+  background: #ffffff;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(168, 85, 247, 0.3);
-  border-radius: 3px;
+  background: #e2e2e4;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(168, 85, 247, 0.5);
+  background: #a3a6af;
 }
 
-@layer utilities {
-  .pattern-dots-sm {
-    background-image: radial-gradient(currentColor 0.5px, transparent 0.5px);
-    background-size: 10px 10px;
-  }
-}
-
-/* Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.6s ease-out forwards;
-}
-
-.animate-fade-in-up {
-  animation: slideIn 0.8s ease-out 0.2s forwards;
-  opacity: 0;
-}
-
-/* ── Ambient orbs ── */
-.orb {
-  position: absolute;
+/* Steep Pill Buttons */
+.btn-pill-filled {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background-color: #17191c;
+  color: #ffffff;
+  border: 1px solid #17191c;
   border-radius: 9999px;
-  filter: blur(100px);
-  animation: orbFloat 12s ease-in-out infinite alternate;
+  padding: 10px 24px;
+  font-family: var(--font-sohne);
+  font-size: 15px;
+  font-weight: 450;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: none;
 }
 
-.orb-purple {
-  width: 700px;
-  height: 700px;
-  top: -15%;
-  left: -10%;
-  background: radial-gradient(circle, rgba(139, 92, 246, 0.18) 0%, transparent 70%);
-  animation-delay: 0s;
+.btn-pill-filled:hover {
+  opacity: 0.88;
 }
 
-.orb-pink {
-  width: 500px;
-  height: 500px;
-  bottom: -10%;
-  right: -5%;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.14) 0%, transparent 70%);
-  animation-delay: -4s;
+.btn-pill-filled:active {
+  transform: scale(0.99);
 }
 
-.orb-cyan {
-  width: 400px;
-  height: 400px;
-  top: 40%;
-  left: 55%;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.10) 0%, transparent 70%);
-  animation-delay: -8s;
+.btn-pill-filled:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-@keyframes orbFloat {
-  from {
-    transform: translateY(0px) scale(1);
-  }
-
-  to {
-    transform: translateY(-40px) scale(1.05);
-  }
-}
-
-/* ── Dot grid ── */
-.dot-grid {
-  position: absolute;
-  inset: 0;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-  background-size: 28px 28px;
-}
-
-/* ── Feature cards ── */
-.feature-card {
-  position: relative;
-  padding: 1.75rem;
-  border-radius: 1.25rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(20px);
-  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-  overflow: hidden;
-  animation: slideIn 0.7s ease-out forwards;
-  opacity: 0;
-}
-
-.feature-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(255, 255, 255, 0.18);
-  box-shadow: 0 0 60px var(--glow, rgba(139, 92, 246, 0.3)), 0 20px 40px rgba(0, 0, 0, 0.4);
-}
-
-.card-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(circle at 50% 0%, var(--glow, rgba(139, 92, 246, 0.15)) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.feature-card:hover .card-glow {
-  opacity: 1;
-}
-
-/* ── Icon wrap ── */
-.icon-wrap {
+.btn-pill-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  gap: 8px;
+  background-color: transparent;
+  color: #17191c;
+  border: 1px solid #17191c;
+  border-radius: 9999px;
+  padding: 10px 24px;
+  font-family: var(--font-sohne);
+  font-size: 15px;
+  font-weight: 450;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: background-color 0.15s ease, opacity 0.15s ease;
 }
 
-/* ── Buttons ── */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1.4rem;
-  border-radius: 0.75rem;
-  font-weight: 700;
-  font-size: 0.875rem;
-  background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%);
-  color: #fff;
+.btn-pill-ghost:hover {
+  background-color: #f2f2f3;
+}
+
+.btn-pill-ghost:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Steep Cards */
+.card-mist {
+  background-color: #f2f2f3;
+  border-radius: 24px;
+  padding: 28px;
   border: none;
-  cursor: pointer;
-  transition: opacity 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-  box-shadow: 0 0 24px rgba(168, 85, 247, 0.4);
+  box-shadow: none;
+  transition: background-color 0.15s ease;
 }
 
-.btn-primary:hover {
-  opacity: 0.9;
-  transform: translateY(-1px);
-  box-shadow: 0 0 36px rgba(168, 85, 247, 0.6);
+.card-peach {
+  background-color: #fbe1d1;
+  color: #5d2a1a;
+  border-radius: 24px;
+  padding: 32px;
+  border: none;
+  box-shadow: none;
 }
 
-.btn-primary:active {
-  transform: scale(0.98);
+.card-floating {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: 0 0 0 1px rgba(4, 23, 43, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.06);
 }
 
-.btn-ghost {
+/* Steep Input */
+.steep-input {
+  width: 100%;
+  height: 48px;
+  background-color: #ffffff;
+  border: 1px solid #ececec;
+  border-radius: 16px;
+  padding: 12px 18px;
+  font-family: var(--font-sohne);
+  font-size: 15px;
+  color: #17191c;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.steep-input::placeholder {
+  color: #a3a6af;
+}
+
+.steep-input:focus {
+  border-color: #17191c;
+}
+
+/* Steep Chips */
+.chip-pill {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0.6rem 1.4rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 0.875rem;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  gap: 6px;
+  background-color: #ffffff;
+  border: 1px solid #ececec;
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-family: var(--font-sohne);
+  font-size: 13px;
+  font-weight: 450;
+  color: #17191c;
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: all 0.15s ease;
 }
 
-.btn-ghost:hover {
-  background: rgba(255, 255, 255, 0.09);
-  color: #fff;
-  transform: translateY(-1px);
+.chip-pill:hover {
+  background-color: #f2f2f3;
 }
 
-/* ── Floating pets ── */
-.floating-pet {
-  position: absolute;
-  animation: petFloat 6s ease-in-out infinite alternate;
-}
-
-@keyframes petFloat {
-  from {
-    transform: translateY(0px) rotate(-3deg);
-  }
-
-  to {
-    transform: translateY(-18px) rotate(3deg);
-  }
-}
-
-/* ── CTA banner ── */
-.cta-banner {
-  position: relative;
-  padding: 3.5rem 2.5rem;
-  border-radius: 2rem;
-  background: rgba(139, 92, 246, 0.07);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-  backdrop-filter: blur(20px);
-  overflow: hidden;
-}
-
-.cta-glow {
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(ellipse at 50% 100%, rgba(168, 85, 247, 0.2) 0%, transparent 70%);
-  pointer-events: none;
+.chip-pill.selected {
+  background-color: #17191c;
+  color: #ffffff;
+  border-color: #17191c;
 }

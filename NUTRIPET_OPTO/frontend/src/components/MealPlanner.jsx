@@ -4,10 +4,10 @@ import axios from 'axios';
 const API_BASE = "http://localhost:8000";
 
 const ACTIVITY_LEVELS = [
-  { value: "inactive", label: "Inactive 🛋️", desc: "Sedentary / recovering" },
-  { value: "normal", label: "Normal 🚶", desc: "Typical daily activity" },
-  { value: "active", label: "Active 🏃", desc: "Regular exercise" },
-  { value: "working", label: "Working 💪", desc: "High-energy working animal" },
+  { value: "inactive", label: "Inactive", desc: "Sedentary / recovering" },
+  { value: "normal", label: "Normal", desc: "Typical daily activity" },
+  { value: "active", label: "Active", desc: "Regular exercise / agility" },
+  { value: "working", label: "Working", desc: "High-energy working animal" },
 ];
 
 const COMMON_INGREDIENTS = [
@@ -17,17 +17,19 @@ const COMMON_INGREDIENTS = [
 ];
 
 // ── Macro Bar ─────────────────────────────────────────────────────────────────
-function MacroBar({ label, value, pct, color }) {
+function MacroBar({ label, value, pct, colorBg }) {
   return (
     <div className="space-y-1">
-      <div className="flex justify-between text-xs text-white/60">
-        <span>{label}</span>
-        <span>{value}g <span className="text-white/30">({pct}%)</span></span>
+      <div className="flex justify-between text-xs font-sans">
+        <span className="text-[#777b86]">{label}</span>
+        <span className="text-[#17191c] font-mono">
+          {value}g <span className="text-[#a3a6af]">({pct}%)</span>
+        </span>
       </div>
-      <div className="h-1.5 rounded-full bg-white/10">
+      <div className="h-1.5 rounded-full bg-[#e2e2e4] w-full overflow-hidden">
         <div
-          className={`h-full rounded-full ${color}`}
-          style={{ width: `${Math.min(100, pct)}%`, transition: "width 0.6s ease" }}
+          className={`h-full rounded-full ${colorBg}`}
+          style={{ width: `${Math.min(100, pct)}%`, transition: "width 0.4s ease" }}
         />
       </div>
     </div>
@@ -76,15 +78,21 @@ function IngredientTagInput({ tags, setTags, suggestions }) {
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div
-        className="min-h-[48px] flex flex-wrap gap-2 items-center p-3 rounded-xl bg-white/5 border border-white/10 focus-within:border-purple-500/60 transition-colors cursor-text"
+        className="min-h-[48px] flex flex-wrap gap-2 items-center p-2.5 bg-[#ffffff] border border-[#ececec] rounded-inputs cursor-text focus-within:border-[#17191c]"
         onClick={() => inputRef.current?.focus()}
       >
         {tags.map(t => (
-          <span key={t} className="flex items-center gap-1 px-2.5 py-1 text-sm rounded-full bg-purple-600/30 text-purple-200 border border-purple-500/30">
+          <span key={t} className="flex items-center gap-1.5 px-3 py-1 text-xs font-sans rounded-full bg-[#f2f2f3] text-[#17191c]">
             {t}
-            <button onClick={() => remove(t)} className="text-purple-400 hover:text-red-400 ml-0.5 text-xs leading-none">✕</button>
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); remove(t); }}
+              className="text-[#777b86] hover:text-[#5d2a1a] ml-1 text-xs"
+            >
+              ✕
+            </button>
           </span>
         ))}
         <input
@@ -92,20 +100,21 @@ function IngredientTagInput({ tags, setTags, suggestions }) {
           value={input}
           onChange={onChange}
           onKeyDown={onKeyDown}
-          onBlur={() => setTimeout(() => setShowDrop(false), 150)}
-          placeholder={tags.length ? "" : "Type ingredient and press Enter…"}
-          className="flex-1 min-w-[160px] bg-transparent outline-none text-sm text-white placeholder-white/25"
+          onBlur={() => setTimeout(() => setShowDrop(false), 200)}
+          placeholder={tags.length ? "" : "Type ingredient and press Enter..."}
+          className="flex-1 min-w-[180px] bg-transparent outline-none text-sm text-[#17191c] placeholder-[#a3a6af]"
         />
       </div>
 
       {showDrop && filtered.length > 0 && (
         <div className="relative z-30">
-          <div className="absolute w-full top-0 rounded-xl bg-gray-900 border border-white/10 shadow-2xl max-h-48 overflow-y-auto">
+          <div className="absolute w-full top-0 bg-[#ffffff] border border-[#ececec] rounded-inputs shadow-subtle max-h-48 overflow-y-auto divide-y divide-[#ececec]">
             {filtered.slice(0, 10).map(s => (
               <button
                 key={s}
+                type="button"
                 onMouseDown={() => add(s)}
-                className="w-full text-left px-4 py-2.5 text-sm text-white/80 hover:bg-purple-700/30 transition-colors"
+                className="w-full text-left px-4 py-2 text-xs text-[#17191c] hover:bg-[#fafafb] transition-colors"
               >
                 {s}
               </button>
@@ -114,13 +123,14 @@ function IngredientTagInput({ tags, setTags, suggestions }) {
         </div>
       )}
 
-      {/* Quick-add pills */}
+      {/* Quick-add options */}
       <div className="flex flex-wrap gap-1.5">
         {COMMON_INGREDIENTS.filter(c => !tags.includes(c)).slice(0, 8).map(c => (
           <button
             key={c}
+            type="button"
             onClick={() => add(c)}
-            className="px-2.5 py-1 text-xs rounded-full bg-white/5 border border-white/10 text-white/50 hover:bg-purple-600/20 hover:text-white hover:border-purple-500/40 transition-all"
+            className="chip-pill text-xs py-1 px-3"
           >
             + {c}
           </button>
@@ -136,51 +146,54 @@ function DayCard({ day, index }) {
   const { day_number, total_grams, total_calories, macro_summary, meals } = day;
 
   return (
-    <div className="rounded-2xl bg-white/[0.04] border border-white/10 overflow-hidden">
-      {/* Day Header */}
+    <div className="card-floating overflow-hidden p-0">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-5 py-4 hover:bg-white/5 transition-colors"
+        className="w-full flex items-center justify-between p-5 hover:bg-[#fafafb] transition-colors text-left"
       >
-        <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-full bg-purple-600/30 border border-purple-500/30 flex items-center justify-center text-xs font-bold text-purple-300">
+        <div className="flex items-center gap-4">
+          <span className="w-8 h-8 rounded-full bg-[#f2f2f3] flex items-center justify-center font-mono text-xs font-semibold text-[#17191c]">
             {day_number}
           </span>
-          <div className="text-left">
-            <p className="font-semibold text-white text-sm">Day {day_number}</p>
-            <p className="text-xs text-white/40">{Math.round(total_grams)}g total · {Math.round(total_calories)} kcal</p>
+          <div>
+            <p className="font-serif text-base text-[#17191c]">Day {day_number} Schedule</p>
+            <p className="text-xs text-[#777b86]">
+              {Math.round(total_grams)}g total food mass · {Math.round(total_calories)} kcal
+            </p>
           </div>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex gap-3 text-xs text-white/40">
+        <div className="flex items-center gap-6">
+          <div className="hidden sm:flex gap-4 text-xs font-mono text-[#777b86]">
             <span>P: {macro_summary.protein_g}g</span>
             <span>F: {macro_summary.fat_g}g</span>
             <span>C: {macro_summary.carbs_g}g</span>
           </div>
-          <span className={`transition-transform duration-200 text-white/40 ${expanded ? "rotate-180" : ""}`}>▾</span>
+          <span className="text-xs text-[#a3a6af] font-mono">{expanded ? "▲" : "▼"}</span>
         </div>
       </button>
 
-      {/* Expanded Meals */}
       {expanded && (
-        <div className="border-t border-white/5 divide-y divide-white/5">
+        <div className="border-t border-[#ececec] divide-y divide-[#ececec] bg-[#ffffff]">
           {meals.map((meal, mi) => (
-            <div key={mi} className="px-5 py-4 space-y-3">
+            <div key={mi} className="p-5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-purple-300">{meal.meal_name}</span>
-                <span className="text-xs text-white/40">{meal.total_grams}g · {Math.round(meal.total_calories)} kcal</span>
+                <span className="text-xs uppercase tracking-wider text-[#979799]">
+                  {meal.meal_name}
+                </span>
+                <span className="text-xs font-mono text-[#777b86]">
+                  {meal.total_grams}g · {Math.round(meal.total_calories)} kcal
+                </span>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {meal.portions.map((p, pi) => (
-                  <div key={pi} className="flex items-center justify-between text-xs">
+                  <div key={pi} className="flex items-center justify-between text-xs py-1">
                     <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 rounded-full bg-purple-400" />
-                      <span className="text-white/80">{p.food_name}</span>
-                      <span className="text-white/30 text-[10px] px-1.5 py-0.5 rounded bg-white/5">{p.category}</span>
+                      <span className="text-[#17191c] font-medium">{p.food_name}</span>
+                      <span className="text-[10px] text-[#979799]">({p.category})</span>
                     </div>
-                    <div className="flex items-center gap-3 text-white/50">
-                      <span className="font-mono">{p.grams}g</span>
-                      <span className="font-mono">{Math.round(p.calories)} kcal</span>
+                    <div className="flex items-center gap-4 font-mono text-[#777b86]">
+                      <span>{p.grams}g</span>
+                      <span>{Math.round(p.calories)} kcal</span>
                     </div>
                   </div>
                 ))}
@@ -188,12 +201,14 @@ function DayCard({ day, index }) {
             </div>
           ))}
 
-          {/* Macro bars */}
-          <div className="px-5 py-4 space-y-2 bg-white/[0.02]">
-            <p className="text-xs text-white/30 font-medium uppercase tracking-wide mb-3">Macro Breakdown</p>
-            <MacroBar label="Protein" value={macro_summary.protein_g} pct={macro_summary.protein_cal_pct} color="bg-blue-500" />
-            <MacroBar label="Fat" value={macro_summary.fat_g} pct={macro_summary.fat_cal_pct} color="bg-amber-500" />
-            <MacroBar label="Carbs" value={macro_summary.carbs_g} pct={macro_summary.carbs_cal_pct} color="bg-green-500" />
+          {/* Macro Breakdown */}
+          <div className="p-5 space-y-3 bg-[#fafafb]">
+            <p className="text-xs text-[#979799] uppercase tracking-wider">
+              Energy Distribution
+            </p>
+            <MacroBar label="Protein" value={macro_summary.protein_g} pct={macro_summary.protein_cal_pct} colorBg="bg-[#17191c]" />
+            <MacroBar label="Fat" value={macro_summary.fat_g} pct={macro_summary.fat_cal_pct} colorBg="bg-[#5d2a1a]" />
+            <MacroBar label="Carbohydrates" value={macro_summary.carbs_g} pct={macro_summary.carbs_cal_pct} colorBg="bg-[#777b86]" />
           </div>
         </div>
       )}
@@ -217,12 +232,10 @@ export default function MealPlanner({ species }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all food names for autocomplete
   useEffect(() => {
     axios.get(`${API_BASE}/foods`).then(r => setAllFoods(r.data.map(f => f.name))).catch(() => { });
   }, []);
 
-  // Update species when prop changes
   useEffect(() => {
     if (species?.length && !selectedSpecies) setSelectedSpecies(species[0].name);
   }, [species]);
@@ -258,24 +271,27 @@ export default function MealPlanner({ species }) {
 
   return (
     <div className="space-y-8">
-      {/* ── Config Panel ── */}
+      {/* Configuration Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-
         {/* Left: Pet Profile */}
-        <div className="lg:col-span-2 space-y-5 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-emerald-600/30">🐾</span>
-            Pet Profile
-          </h2>
+        <div className="lg:col-span-2 space-y-5 card-floating">
+          <div>
+            <span className="text-xs text-[#979799] uppercase tracking-wider block mb-1">
+              Pet Profile
+            </span>
+            <h2 className="text-2xl font-serif text-[#17191c]">
+              Biological Targets
+            </h2>
+          </div>
 
           {/* Species */}
-          <div className="space-y-1.5">
-            <label className="text-xs text-white/50 uppercase tracking-wide">Species</label>
+          <div className="space-y-1">
+            <label className="text-xs font-sans text-[#777b86]">Species</label>
             <select
               id="planner-species"
               value={selectedSpecies}
               onChange={e => setSelectedSpecies(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-purple-500/60 transition-colors"
+              className="steep-input"
             >
               <option value="">— Select Species —</option>
               {(species || []).map(s => (
@@ -285,23 +301,26 @@ export default function MealPlanner({ species }) {
           </div>
 
           {/* Weight */}
-          <div className="space-y-1.5">
-            <label className="text-xs text-white/50 uppercase tracking-wide">Body Weight</label>
+          <div className="space-y-1">
+            <label className="text-xs font-sans text-[#777b86]">Body Weight</label>
             <div className="flex gap-2">
               <input
                 id="planner-weight"
                 type="number" min="0.1" step="0.1"
                 value={weightKg}
                 onChange={e => setWeightKg(parseFloat(e.target.value) || 0)}
-                className="flex-1 bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-purple-500/60 transition-colors"
+                className="steep-input flex-1"
               />
-              <div className="flex rounded-xl overflow-hidden border border-white/10 text-xs">
+              <div className="flex bg-[#f2f2f3] p-1 rounded-full text-xs">
                 {["kg", "lbs"].map(u => (
                   <button
                     key={u}
                     id={`planner-unit-${u}`}
+                    type="button"
                     onClick={() => setWeightUnit(u)}
-                    className={`px-3 py-2 transition-colors ${weightUnit === u ? "bg-purple-600 text-white" : "bg-white/5 text-white/40 hover:bg-white/10"}`}
+                    className={`px-3 py-1.5 rounded-full transition-colors ${
+                      weightUnit === u ? "bg-[#17191c] text-[#ffffff]" : "text-[#777b86] hover:text-[#17191c]"
+                    }`}
                   >
                     {u}
                   </button>
@@ -309,54 +328,58 @@ export default function MealPlanner({ species }) {
               </div>
             </div>
             {weightUnit === "lbs" && (
-              <p className="text-[11px] text-white/25">≈ {weightKgActual.toFixed(2)} kg</p>
+              <p className="text-[11px] text-[#a3a6af] font-mono">≈ {weightKgActual.toFixed(2)} kg</p>
             )}
           </div>
 
-          {/* Activity */}
+          {/* Activity Level */}
           <div className="space-y-1.5">
-            <label className="text-xs text-white/50 uppercase tracking-wide">Activity Level</label>
+            <label className="text-xs font-sans text-[#777b86]">Activity Level</label>
             <div className="grid grid-cols-2 gap-2">
               {ACTIVITY_LEVELS.map(al => (
                 <button
                   key={al.value}
                   id={`planner-activity-${al.value}`}
+                  type="button"
                   onClick={() => setActivityLevel(al.value)}
-                  className={`text-left px-3 py-2.5 rounded-xl border text-xs transition-all ${activityLevel === al.value
-                      ? "bg-purple-600/30 border-purple-500/50 text-white"
-                      : "bg-white/[0.03] border-white/10 text-white/50 hover:border-white/20"
-                    }`}
+                  className={`text-left p-3 rounded-inputs text-xs font-sans transition-all ${
+                    activityLevel === al.value
+                      ? "bg-[#17191c] text-[#ffffff]"
+                      : "bg-[#f2f2f3] text-[#17191c] hover:bg-[#eaeaea]"
+                  }`}
                 >
                   <div className="font-semibold">{al.label}</div>
-                  <div className="opacity-60 mt-0.5">{al.desc}</div>
+                  <div className="text-[10px] opacity-75">{al.desc}</div>
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Days & Meals sliders */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <label className="text-xs text-white/50 uppercase tracking-wide">
-                Days <span className="text-purple-400 font-bold">{days}</span>
+          {/* Days & Meals */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <label className="text-xs font-sans text-[#777b86]">
+                Days: <span className="font-mono text-[#17191c]">{days}</span>
               </label>
               <input
                 id="planner-days"
                 type="range" min="1" max="7" step="1" value={days}
                 onChange={e => setDays(parseInt(e.target.value))}
-                className="w-full accent-purple-500"
+                className="w-full accent-[#17191c]"
               />
-              <div className="flex justify-between text-[10px] text-white/20"><span>1</span><span>7</span></div>
             </div>
-            <div className="space-y-1.5">
-              <label className="text-xs text-white/50 uppercase tracking-wide">Meals/Day</label>
-              <div className="flex rounded-xl overflow-hidden border border-white/10">
+            <div className="space-y-1">
+              <label className="text-xs font-sans text-[#777b86]">Meals / Day</label>
+              <div className="flex bg-[#f2f2f3] p-1 rounded-full text-xs">
                 {[1, 2, 3].map(m => (
                   <button
                     key={m}
                     id={`planner-meals-${m}`}
+                    type="button"
                     onClick={() => setMealsPerDay(m)}
-                    className={`flex-1 py-2 text-xs transition-colors ${mealsPerDay === m ? "bg-purple-600 text-white" : "bg-white/5 text-white/40 hover:bg-white/10"}`}
+                    className={`flex-1 py-1.5 rounded-full font-mono transition-colors ${
+                      mealsPerDay === m ? "bg-[#17191c] text-[#ffffff]" : "text-[#777b86] hover:text-[#17191c]"
+                    }`}
                   >
                     {m}
                   </button>
@@ -365,30 +388,34 @@ export default function MealPlanner({ species }) {
             </div>
           </div>
 
-          {/* Optional calorie override */}
-          <div className="space-y-1.5">
-            <label className="text-xs text-white/50 uppercase tracking-wide">
-              Override Daily Calories <span className="text-white/25">(optional)</span>
+          {/* Caloric override */}
+          <div className="space-y-1">
+            <label className="text-xs font-sans text-[#777b86]">
+              Caloric Override <span className="text-[#a3a6af]">(optional)</span>
             </label>
             <input
               id="planner-calorie-override"
-              type="number" min="0" placeholder="Auto-calculated (RER × MER)"
+              type="number" min="0" placeholder="Auto (RER × MER)"
               value={targetCaloriesOverride}
               onChange={e => setTargetCaloriesOverride(e.target.value)}
-              className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white outline-none focus:border-purple-500/60 placeholder-white/20 transition-colors"
+              className="steep-input"
             />
           </div>
         </div>
 
-        {/* Right: Ingredient Input + Generate */}
-        <div className="lg:col-span-3 space-y-5 p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl">
-          <h2 className="text-base font-bold text-white flex items-center gap-2">
-            <span className="p-1.5 rounded-lg bg-blue-600/30">🥩</span>
-            Available Raw Ingredients
-          </h2>
-          <p className="text-xs text-white/40 leading-relaxed">
-            Enter the raw ingredients you have available. The planner will calculate exact grams and calories per ingredient
-            per meal — and automatically flag and exclude anything toxic for your pet.
+        {/* Right: Ingredient Input */}
+        <div className="lg:col-span-3 space-y-5 card-floating">
+          <div>
+            <span className="text-xs text-[#979799] uppercase tracking-wider block mb-1">
+              Raw Ingredients
+            </span>
+            <h2 className="text-2xl font-serif text-[#17191c]">
+              Available Feeds
+            </h2>
+          </div>
+
+          <p className="text-xs text-[#777b86] leading-relaxed">
+            Enter available raw ingredients. The optimizer balances mass, energy, and macronutrient targets, excluding any known toxic ingredients automatically.
           </p>
 
           <IngredientTagInput
@@ -398,9 +425,13 @@ export default function MealPlanner({ species }) {
           />
 
           {ingredients.length > 0 && (
-            <div className="text-xs text-white/40 flex items-center gap-2">
-              <span className="text-purple-400">{ingredients.length}</span> ingredient{ingredients.length !== 1 ? "s" : ""} selected
-              <button onClick={() => setIngredients([])} className="text-red-400/60 hover:text-red-400 ml-auto transition-colors">
+            <div className="text-xs text-[#777b86] flex items-center justify-between">
+              <span>{ingredients.length} ingredient{ingredients.length !== 1 ? "s" : ""} selected</span>
+              <button
+                type="button"
+                onClick={() => setIngredients([])}
+                className="text-[#5d2a1a] hover:underline"
+              >
                 Clear all
               </button>
             </div>
@@ -408,139 +439,119 @@ export default function MealPlanner({ species }) {
 
           <button
             id="planner-generate-btn"
+            type="button"
             onClick={handleGenerate}
             disabled={isLoading || !selectedSpecies || !ingredients.length}
-            className="w-full py-3.5 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2
-              bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500
-              disabled:opacity-40 disabled:cursor-not-allowed shadow-lg shadow-purple-900/30
-              active:scale-[0.98]"
+            className="btn-pill-filled w-full py-3.5 text-sm"
           >
-            {isLoading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                Generating Plan…
-              </>
-            ) : (
-              <>📅 Generate {days}-Day Meal Plan</>
-            )}
+            {isLoading ? "Generating Balanced Formulation..." : `Generate ${days}-Day Formulation →`}
           </button>
 
           {error && (
-            <div className="bg-red-900/30 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
-              <span className="text-red-400 mt-0.5">⚠</span>
+            <div className="p-4 rounded-inputs bg-[#fbe1d1] text-[#5d2a1a] text-xs">
+              <span className="font-bold">Formulation Error: </span>
               <span>{error}</span>
             </div>
           )}
 
-          {/* Info panel when no plan yet */}
           {!plan && !isLoading && !error && (
-            <div className="mt-4 p-4 rounded-xl bg-white/[0.02] border border-dashed border-white/10 text-center space-y-2">
-              <div className="text-4xl opacity-40">📅</div>
-              <p className="text-sm text-white/30">Enter your pet's profile &amp; ingredients, then generate a plan</p>
-              <p className="text-xs text-white/20">Powered by veterinary RER/MER caloric formulas + linear optimization</p>
+            <div className="p-6 rounded-inputs bg-[#fafafb] border border-dashed border-[#ececec] text-center space-y-1">
+              <p className="text-sm font-serif text-[#17191c]">No Plan Generated</p>
+              <p className="text-xs text-[#a3a6af]">
+                Specify your pet's parameters and ingredients above to compute exact feeding portions.
+              </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* ── Results ── */}
+      {/* Generated Plan Output */}
       {plan && (
-        <div className="space-y-6 animate-fade-in">
-
-          {/* Toxic Safety Banner */}
+        <div className="space-y-6">
+          {/* Excluded Toxic Ingredients Banner */}
           {toxicWarnings.length > 0 && (
-            <div className="p-5 rounded-2xl bg-red-900/25 border border-red-500/30 space-y-2">
-              <p className="text-red-300 font-bold text-sm flex items-center gap-2">
-                ☠️ Toxic Ingredients Detected &amp; Excluded from Plan
+            <div className="card-peach space-y-1">
+              <p className="text-xs font-serif font-bold text-[#5d2a1a] uppercase tracking-wider">
+                ⚠️ Hazardous Ingredients Excluded from Plan
               </p>
               {toxicWarnings.map((w, i) => (
-                <p key={i} className="text-xs text-red-400/80 pl-6">{w}</p>
+                <p key={i} className="text-xs text-[#5d2a1a]">{w}</p>
               ))}
             </div>
           )}
 
           {infoWarnings.length > 0 && (
-            <div className="p-4 rounded-2xl bg-yellow-900/20 border border-yellow-500/25 space-y-1.5">
-              <p className="text-yellow-300 font-bold text-xs flex items-center gap-2">⚠️ Notes</p>
+            <div className="p-5 rounded-cards bg-[#f2f2f3] space-y-1">
+              <p className="text-xs font-bold text-[#17191c] uppercase tracking-wider">
+                ℹ️ Formulation Notes
+              </p>
               {infoWarnings.map((w, i) => (
-                <p key={i} className="text-xs text-yellow-400/70 pl-5">{w}</p>
+                <p key={i} className="text-xs text-[#777b86]">{w}</p>
               ))}
             </div>
           )}
 
-          {/* Summary Stats */}
+          {/* Metric Summary Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { label: "Daily Target", value: `${Math.round(plan.daily_target_calories)} kcal`, sub: "Maintenance Energy", icon: "🔥" },
-              { label: "RER", value: `${Math.round(plan.rer_kcal)} kcal`, sub: "Resting Energy Req.", icon: "💤" },
-              { label: "Body Weight", value: `${plan.pet_weight_kg} kg`, sub: plan.species_name, icon: "⚖️" },
-              { label: "Plan Duration", value: `${plan.days_planned} Days`, sub: `${plan.meals_per_day} meals/day`, icon: "📅" },
+              { label: "Daily Target", value: `${Math.round(plan.daily_target_calories)} kcal`, sub: "Maintenance Energy" },
+              { label: "RER", value: `${Math.round(plan.rer_kcal)} kcal`, sub: "Resting Energy Req." },
+              { label: "Body Mass", value: `${plan.pet_weight_kg} kg`, sub: plan.species_name },
+              { label: "Duration", value: `${plan.days_planned} Days`, sub: `${plan.meals_per_day} meals / day` },
             ].map((c, i) => (
-              <div key={i} className="p-4 rounded-2xl bg-white/[0.04] border border-white/10 text-center space-y-1">
-                <div className="text-xl">{c.icon}</div>
-                <div className="text-lg font-bold text-white">{c.value}</div>
-                <div className="text-[11px] text-white/40">{c.label}</div>
-                <div className="text-[10px] text-white/25">{c.sub}</div>
+              <div key={i} className="card-floating text-center space-y-1">
+                <div className="text-2xl font-serif text-[#17191c]">{c.value}</div>
+                <div className="text-xs font-sans text-[#777b86]">{c.label}</div>
+                <div className="text-[10px] text-[#a3a6af] font-sans">{c.sub}</div>
               </div>
             ))}
           </div>
 
-          {/* Day Cards */}
-          <div>
-            <h3 className="text-sm font-bold text-white/60 uppercase tracking-widest mb-4">
-              📋 Day-by-Day Meal Plan
+          {/* Day-by-Day Cards */}
+          <div className="space-y-3">
+            <h3 className="text-xs text-[#979799] uppercase tracking-wider">
+              Day-by-Day Meal Portions
             </h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {plan.daily_plans.map((day, i) => (
                 <DayCard key={day.day_number} day={day} index={i} />
               ))}
             </div>
           </div>
 
-          {/* Grocery List */}
-          <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold text-white/60 uppercase tracking-widest flex items-center gap-2">
-                🛒 Grocery Shopping List
+          {/* Grocery Shopping List */}
+          <div className="card-floating space-y-4">
+            <div className="flex items-center justify-between border-b border-[#ececec] pb-3">
+              <h3 className="text-lg font-serif text-[#17191c]">
+                Total Ingredients ({plan.days_planned} Days)
               </h3>
-              <span className="text-xs text-white/30 bg-white/5 px-3 py-1 rounded-full">
-                {plan.days_planned}-day total
-              </span>
             </div>
-            <div className="space-y-2">
+
+            <div className="divide-y divide-[#ececec]">
               {plan.grocery_list.map((g, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-white/5 last:border-0">
-                  <div className="flex items-center gap-3">
-                    <span className="w-6 h-6 rounded-full bg-white/5 flex items-center justify-center text-xs text-white/40">{i + 1}</span>
-                    <div>
-                      <p className="text-sm text-white font-medium">{g.food_name}</p>
-                      <p className="text-[11px] text-white/30">{g.category}</p>
-                    </div>
+                <div key={i} className="py-2.5 flex items-center justify-between text-xs font-sans">
+                  <div>
+                    <span className="font-medium text-[#17191c]">{g.food_name}</span>
+                    <span className="text-[#a3a6af] ml-2">({g.category})</span>
                   </div>
-                  <div className="flex items-center gap-4 text-right">
-                    <p className="text-sm font-mono font-bold text-white">{Math.round(g.total_grams)}g</p>
+                  <div className="flex items-center gap-6 font-mono">
+                    <span className="text-[#17191c]">{Math.round(g.total_grams)}g</span>
                     {g.total_cost_usd > 0 && (
-                      <p className="text-xs text-emerald-400 font-mono w-16">${g.total_cost_usd.toFixed(2)}</p>
+                      <span className="text-[#5d2a1a]">${g.total_cost_usd.toFixed(2)}</span>
                     )}
                   </div>
                 </div>
               ))}
             </div>
+
             {plan.total_estimated_cost_usd > 0 && (
-              <div className="flex justify-end pt-2">
-                <div className="px-4 py-2 rounded-xl bg-emerald-900/30 border border-emerald-500/30 text-sm">
-                  <span className="text-white/50">Estimated total: </span>
-                  <span className="font-bold text-emerald-400">${plan.total_estimated_cost_usd.toFixed(2)}</span>
-                </div>
+              <div className="flex justify-end pt-3 border-t border-[#ececec] text-xs font-sans">
+                <span className="text-[#777b86]">Estimated Total: </span>
+                <span className="font-mono font-bold text-[#17191c] ml-2">
+                  ${plan.total_estimated_cost_usd.toFixed(2)}
+                </span>
               </div>
             )}
-          </div>
-
-          {/* Vet Disclaimer */}
-          <div className="p-4 rounded-xl bg-blue-900/15 border border-blue-500/15 text-xs text-blue-300/60 leading-relaxed">
-            <strong className="text-blue-300/80">⚕ Veterinary Note:</strong> Caloric requirements are estimated using WSAVA/NRC
-            RER × MER formulas. Actual needs may vary by breed, health status, and reproductive state.
-            Always consult a licensed veterinarian before changing your pet's diet.
           </div>
         </div>
       )}

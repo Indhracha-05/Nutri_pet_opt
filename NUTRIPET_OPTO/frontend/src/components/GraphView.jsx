@@ -4,8 +4,8 @@ import CytoscapeComponent from 'react-cytoscapejs';
 export default function GraphView({ graphData }) {
     if (!graphData || !graphData.elements || graphData.elements.length === 0) {
         return (
-            <div className="rounded-2xl bg-white/5 border border-white/10 p-6 h-full flex items-center justify-center">
-                <p className="text-white/30">No graph data available for this analysis.</p>
+            <div className="bg-[#FAFAF9] border border-[#E7E5E4] p-6 h-full flex items-center justify-center">
+                <p className="text-[#A8A29E] text-xs">No graph topology available for this inquiry.</p>
             </div>
         );
     }
@@ -14,70 +14,92 @@ export default function GraphView({ graphData }) {
         name: 'cose',
         animate: false,
         nodeDimensionsIncludeLabels: true,
-        padding: 10,
-        componentSpacing: 100,
+        padding: 20,
+        componentSpacing: 80,
     };
 
     const stylesheet = [
         {
             selector: 'node',
             style: {
-                'background-color': 'data(color)',
+                'background-color': '#78716C',
                 'label': 'data(label)',
+                'font-family': 'Inter',
                 'font-size': '11px',
                 'text-valign': 'center',
                 'text-halign': 'center',
-                'width': '50px',
-                'height': '50px',
-                'color': '#fff',
-                'text-outline-width': 2,
-                'text-outline-color': '#1a1a2e',
+                'width': '48px',
+                'height': '48px',
+                'color': '#FAFAF9',
+                'text-outline-width': 0,
                 'text-wrap': 'wrap',
-                'text-max-width': '80px',
+                'text-max-width': '75px',
             }
         },
         {
             selector: 'edge',
             style: {
-                'width': 2,
-                'line-color': 'data(color)',
-                'target-arrow-color': 'data(color)',
+                'width': 1.5,
+                'line-color': '#D6D3D1',
+                'target-arrow-color': '#78716C',
                 'target-arrow-shape': 'triangle',
                 'curve-style': 'bezier',
                 'label': 'data(label)',
+                'font-family': 'Inter',
                 'font-size': '9px',
                 'text-rotation': 'autorotate',
-                'text-background-opacity': 0.9,
-                'text-background-color': '#1a1a2e',
+                'text-background-opacity': 1,
+                'text-background-color': '#FAFAF9',
                 'text-background-padding': '2px',
-                'color': '#aaa'
+                'color': '#57534E'
             }
         },
         {
             selector: 'node[type="Species"]',
             style: {
-                'shape': 'star',
+                'shape': 'rectangle',
+                'background-color': '#1C1917',
                 'width': '60px',
-                'height': '60px',
+                'height': '40px',
             }
         },
         {
             selector: 'node[type="Food"]',
             style: {
                 'shape': 'ellipse',
-                'width': '55px',
-                'height': '55px',
+                'background-color': '#78716C',
+                'width': '52px',
+                'height': '52px',
+            }
+        },
+        {
+            selector: 'node[type="Nutrient"]',
+            style: {
+                'shape': 'round-rectangle',
+                'background-color': '#A8A29E',
+                'width': '45px',
+                'height': '35px',
             }
         }
     ];
 
     return (
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-4 h-full flex flex-col">
-            <h3 className="text-base font-bold text-white/80 mb-3 px-2 border-b border-white/10 pb-2 flex items-center gap-2">
-                <span className="bg-purple-600/30 p-1.5 rounded-lg">⚡</span>
-                Knowledge Graph Context
-            </h3>
-            <div className="flex-grow border border-white/5 rounded-xl bg-gray-950/50 overflow-hidden relative" style={{ minHeight: '350px' }}>
+        <div className="bg-[#FAFAF9] border border-[#E7E5E4] p-5 h-full flex flex-col justify-between">
+            <div className="flex items-center justify-between pb-3 border-b border-[#E7E5E4]">
+                <div>
+                    <span className="text-xs font-sans font-semibold uppercase tracking-wider text-[#78716C]">
+                        Knowledge Graph
+                    </span>
+                    <h3 className="font-serif font-bold text-base text-[#1C1917] mt-0.5">
+                        Biochemical Relationship Topology
+                    </h3>
+                </div>
+                <span className="text-[11px] text-[#A8A29E] font-sans">
+                  Interactive Node Canvas
+                </span>
+            </div>
+
+            <div className="my-3 border border-[#E7E5E4] bg-[#F5F5F4] overflow-hidden relative" style={{ minHeight: '340px' }}>
                 <CytoscapeComponent
                     elements={CytoscapeComponent.normalizeElements(graphData.elements)}
                     style={{ width: '100%', height: '100%' }}
@@ -91,8 +113,9 @@ export default function GraphView({ graphData }) {
                     wheelSensitivity={0.2}
                 />
             </div>
-            <p className="text-xs text-white/25 mt-2 text-center">
-                Visualizing relationships between species, food, and nutrients. Drag nodes to interact.
+
+            <p className="text-xs text-[#A8A29E] text-center font-sans">
+                Drag nodes to inspect entity interactions and metabolic dependencies.
             </p>
         </div>
     );

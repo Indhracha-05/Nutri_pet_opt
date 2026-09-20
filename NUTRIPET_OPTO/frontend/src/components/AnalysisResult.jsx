@@ -2,15 +2,6 @@ import React from 'react';
 import NutrientRadar from './NutrientRadar';
 import GraphView from './GraphView';
 
-const GRADE_STYLES = {
-  A: { bg: 'from-emerald-500 to-green-600', glow: 'shadow-emerald-500/40' },
-  B: { bg: 'from-teal-500 to-emerald-600', glow: 'shadow-teal-500/40' },
-  C: { bg: 'from-yellow-500 to-amber-600', glow: 'shadow-yellow-500/40' },
-  D: { bg: 'from-orange-500 to-red-500', glow: 'shadow-orange-500/40' },
-  E: { bg: 'from-red-500 to-rose-600', glow: 'shadow-red-500/40' },
-  F: { bg: 'from-red-700 to-rose-900', glow: 'shadow-red-700/40' },
-};
-
 export default function AnalysisResult({ result }) {
   if (!result) return null;
 
@@ -26,88 +17,128 @@ export default function AnalysisResult({ result }) {
     graph_data,
   } = result;
 
-  const gs = GRADE_STYLES[health_grade] || GRADE_STYLES.C;
-
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Grade Header */}
-      <div className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden">
-        <div className={`p-8 text-center bg-gradient-to-br ${gs.bg} shadow-xl ${gs.glow}`}>
-          <h2 className="text-7xl font-extrabold text-white drop-shadow-xl tracking-tight">{health_grade}</h2>
-          <p className="mt-2 text-xl font-bold text-white/80 uppercase tracking-widest">Health Grade</p>
-          <div className="mt-2 inline-block px-4 py-1.5 bg-white/15 rounded-full text-sm text-white/90 backdrop-blur-sm font-medium">
-            Confidence: {(confidence * 100).toFixed(1)}%
+    <div className="space-y-6">
+      {/* Top Floating Card: Grade & Diagnostic Summary */}
+      <div className="card-floating space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#ececec] gap-4">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 rounded-inputs bg-[#f2f2f3] flex items-center justify-center text-4xl font-serif text-[#17191c]">
+              {health_grade}
+            </div>
+            <div>
+              <span className="text-xs text-[#979799] uppercase tracking-wider block">
+                Health Evaluation
+              </span>
+              <h3 className="text-2xl font-serif text-[#17191c] mt-0.5">
+                Grade {health_grade} Assessment
+              </h3>
+            </div>
+          </div>
+
+          <div className="text-left sm:text-right">
+            <span className="text-xs text-[#a3a6af] block font-sans">Model Confidence</span>
+            <span className="text-xl font-mono text-[#17191c]">
+              {(confidence * 100).toFixed(1)}%
+            </span>
           </div>
         </div>
 
-        <div className="p-6 space-y-5">
-          {is_toxic && (
-            <div className="bg-red-900/40 border border-red-500/40 rounded-xl p-4 flex items-start gap-3">
-              <span className="text-red-400 text-2xl flex-shrink-0">☠</span>
-              <div>
-                <h3 className="text-base font-bold text-red-300">Toxicity Alert!</h3>
-                <p className="mt-1 text-sm text-red-300/80">
-                  This food contains <span className="font-bold text-red-200">{toxicity_reason}</span> which is toxic to this species.
-                </p>
-              </div>
+        {/* Toxicity Callout Banner (Accent Peach surface per Steep) */}
+        {is_toxic && (
+          <div className="card-peach space-y-2">
+            <div className="flex items-center gap-2">
+              <span className="font-serif font-bold text-base text-[#5d2a1a]">
+                ⚠️ Toxicity Risk Identified
+              </span>
             </div>
-          )}
-
-          <div>
-            <h4 className="text-sm font-bold text-white/70 uppercase tracking-wide mb-2 flex items-center gap-2">
-              <span className="p-1 rounded bg-purple-600/30">📋</span> Analysis Report
-            </h4>
-            <p className="whitespace-pre-wrap text-white/60 leading-relaxed text-sm">{explanation_text}</p>
+            <p className="text-sm text-[#5d2a1a] leading-relaxed">
+              This ingredient contains <strong className="font-semibold">{toxicity_reason}</strong>, which presents known biological toxicity for this species.
+            </p>
           </div>
+        )}
+
+        {/* Narrative Explanation */}
+        <div className="space-y-2">
+          <span className="text-xs text-[#979799] uppercase tracking-wider block">
+            Nutritional Rationale
+          </span>
+          <p className="whitespace-pre-wrap text-sm text-[#17191c] leading-relaxed font-sans">
+            {explanation_text}
+          </p>
         </div>
       </div>
 
-      {/* Visualizations Grid */}
+      {/* Metrics & Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="h-full">
-          <NutrientRadar features={graph_features} />
+        {/* Nutrient Radar */}
+        <div className="card-floating h-full flex flex-col justify-between">
+          <div className="mb-4">
+            <span className="text-xs text-[#979799] uppercase tracking-wider block">
+              Nutrient Compatibility
+            </span>
+            <h4 className="font-serif text-lg text-[#17191c] mt-0.5">
+              Biological Profile Radar
+            </h4>
+          </div>
+          <div className="h-64">
+            <NutrientRadar features={graph_features} />
+          </div>
         </div>
 
-        <div className="rounded-2xl bg-white/5 border border-white/10 p-5 flex flex-col h-full">
-          <div className="mb-5 flex-grow">
-            <h4 className="font-bold text-white/70 uppercase tracking-wide text-sm mb-4 pb-2 border-b border-white/10 flex items-center gap-2">
-              <span className="p-1 rounded bg-purple-600/30">📊</span>
-              Top Influencing Factors
-            </h4>
-            <ul className="space-y-2">
+        {/* Influencing Factors & Caloric Density */}
+        <div className="card-floating flex flex-col justify-between space-y-6">
+          <div className="space-y-4">
+            <div>
+              <span className="text-xs text-[#979799] uppercase tracking-wider block">
+                Explainability Weights
+              </span>
+              <h4 className="font-serif text-lg text-[#17191c] mt-0.5">
+                Top Influencing Features
+              </h4>
+            </div>
+
+            <ul className="divide-y divide-[#ececec]">
               {top_factors && top_factors.map((tf, index) => (
-                <li key={index} className="flex justify-between items-center text-sm p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
-                  <span className="font-medium text-white/70 capitalize">{tf.feature.replace(/_/g, ' ')}</span>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-xs text-white/40 font-mono">Val: {tf.value.toFixed(2)}</span>
-                    <span className="text-xs font-bold text-purple-300 bg-purple-600/30 px-2.5 py-1 rounded-md">Imp: {tf.importance.toFixed(2)}</span>
+                <li key={index} className="py-2.5 flex items-center justify-between text-xs">
+                  <span className="text-[#17191c] capitalize font-sans">
+                    {tf.feature.replace(/_/g, ' ')}
+                  </span>
+                  <div className="flex items-center gap-4 font-mono text-xs">
+                    <span className="text-[#777b86]">val: {tf.value.toFixed(2)}</span>
+                    <span className="text-[#17191c] font-semibold">
+                      imp: {tf.importance.toFixed(2)}
+                    </span>
                   </div>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="pt-5 border-t border-white/10">
-            <h4 className="font-bold text-white/70 uppercase tracking-wide text-sm mb-3 flex justify-between items-center">
-              <span>Caloric Density</span>
-              <span className="text-purple-300 bg-purple-600/20 px-2 py-0.5 rounded text-xs font-mono">{(predicted_caloric_density * 100).toFixed(0)}/100</span>
-            </h4>
-            <div className="relative pt-1">
-              <div className="overflow-hidden h-2.5 rounded-full bg-white/10">
-                <div
-                  style={{ width: `${predicted_caloric_density * 100}%` }}
-                  className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-1000 ease-out shadow-sm shadow-purple-400/30"
-                />
-              </div>
-              <p className="text-xs text-white/30 text-right mt-1">Higher = More calories per gram</p>
+          {/* Caloric Density Indicator */}
+          <div className="pt-4 border-t border-[#ececec] space-y-2">
+            <div className="flex justify-between items-center text-xs">
+              <span className="text-[#777b86]">Caloric Density Index</span>
+              <span className="font-mono text-[#17191c]">
+                {(predicted_caloric_density * 100).toFixed(0)} / 100
+              </span>
             </div>
+            <div className="h-2 rounded-full bg-[#f2f2f3] w-full overflow-hidden">
+              <div
+                style={{ width: `${Math.min(100, Math.max(0, predicted_caloric_density * 100))}%` }}
+                className="h-full rounded-full bg-[#5d2a1a] transition-all duration-500"
+              />
+            </div>
+            <p className="text-[11px] text-[#a3a6af] text-right">
+              Relative energy mass index
+            </p>
           </div>
         </div>
       </div>
 
       {/* Graph Visualizer */}
       {graph_data && (
-        <div className="h-[500px] w-full animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
+        <div className="h-[460px] w-full">
           <GraphView graphData={graph_data} />
         </div>
       )}

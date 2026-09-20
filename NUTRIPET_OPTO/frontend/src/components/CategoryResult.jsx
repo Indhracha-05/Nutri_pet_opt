@@ -1,66 +1,61 @@
 import React, { useState } from 'react';
 import NutrientRadar from './NutrientRadar';
 
-const GRADE_COLORS = {
-  A: { bg: 'from-emerald-500 to-green-600', badge: 'bg-emerald-500', text: 'text-emerald-400', border: 'border-emerald-500/40' },
-  B: { bg: 'from-teal-500 to-emerald-600', badge: 'bg-teal-500', text: 'text-teal-400', border: 'border-teal-500/40' },
-  C: { bg: 'from-yellow-500 to-amber-600', badge: 'bg-yellow-500', text: 'text-yellow-400', border: 'border-yellow-500/40' },
-  D: { bg: 'from-orange-500 to-red-500', badge: 'bg-orange-500', text: 'text-orange-400', border: 'border-orange-500/40' },
-  E: { bg: 'from-red-500 to-rose-600', badge: 'bg-red-500', text: 'text-red-400', border: 'border-red-500/40' },
-  F: { bg: 'from-red-700 to-rose-900', badge: 'bg-red-700', text: 'text-red-300', border: 'border-red-700/40' },
-};
-
 function MiniCard({ item, isExpanded, onToggle }) {
   const { food_name, category, analysis } = item;
   const { health_grade, confidence, is_toxic, explanation_text, predicted_caloric_density, graph_features } = analysis;
-  const gc = GRADE_COLORS[health_grade] || GRADE_COLORS.C;
 
   return (
-    <div className={`rounded-2xl border ${gc.border} bg-white/5 overflow-hidden transition-all duration-300 hover:bg-white/[0.08]`}>
-      {/* Row header */}
+    <div className="rounded-inputs bg-[#f2f2f3] transition-colors hover:bg-[#eaeaea] overflow-hidden">
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-4 p-4 text-left"
+        className="w-full flex items-center justify-between p-4 text-left"
       >
-        {/* Grade badge */}
-        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gc.bg} flex items-center justify-center flex-shrink-0 shadow-lg`}>
-          <span className="text-white text-xl font-extrabold">{health_grade}</span>
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <p className="font-bold text-white truncate">{food_name}</p>
-            {is_toxic && <span className="flex-shrink-0 text-xs px-2 py-0.5 rounded-full bg-red-900/60 text-red-300 border border-red-500/30">☠ Toxic</span>}
+        <div className="flex items-center gap-4">
+          <div className="w-10 h-10 rounded-inputs bg-[#ffffff] flex items-center justify-center font-serif text-lg text-[#17191c]">
+            {health_grade}
           </div>
-          <p className="text-xs text-white/40 mt-0.5">{category} · Confidence: {(confidence * 100).toFixed(0)}%</p>
-        </div>
 
-        {/* Bar */}
-        <div className="w-20 flex-shrink-0 hidden sm:block">
-          <div className="h-1.5 w-full rounded-full bg-white/10">
-            <div
-              className={`h-full rounded-full bg-gradient-to-r ${gc.bg}`}
-              style={{ width: `${predicted_caloric_density * 100}%` }}
-            />
+          <div>
+            <div className="flex items-center gap-2">
+              <p className="font-serif text-base text-[#17191c]">{food_name}</p>
+              {is_toxic && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#fbe1d1] text-[#5d2a1a] font-medium">
+                  Toxin
+                </span>
+              )}
+            </div>
+            <p className="text-xs text-[#777b86]">
+              {category} · Confidence {(confidence * 100).toFixed(0)}%
+            </p>
           </div>
-          <p className="text-xs text-white/30 mt-1 text-right">Cal density</p>
         </div>
 
-        <span className="text-white/30 text-sm">{isExpanded ? '▲' : '▼'}</span>
+        <div className="flex items-center gap-6">
+          <div className="hidden sm:block text-right">
+            <span className="text-xs font-mono text-[#777b86] block">
+              {(predicted_caloric_density * 100).toFixed(0)} cal-idx
+            </span>
+          </div>
+          <span className="text-xs text-[#777b86] font-mono">
+            {isExpanded ? '▲' : '▼'}
+          </span>
+        </div>
       </button>
 
-      {/* Expanded detail */}
       {isExpanded && (
-        <div className="px-4 pb-4 space-y-4 border-t border-white/10 pt-4">
-          {is_toxic && (
-            <div className="bg-red-900/40 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-300">
-              ⚠ <strong>Toxicity Warning:</strong> {explanation_text}
+        <div className="px-5 pb-5 pt-3 border-t border-[#e2e2e4] space-y-4 bg-[#ffffff]">
+          {is_toxic ? (
+            <div className="p-3 rounded-inputs bg-[#fbe1d1] text-xs text-[#5d2a1a]">
+              <strong>Toxicity Warning:</strong> {explanation_text}
             </div>
+          ) : (
+            <p className="text-xs text-[#17191c] leading-relaxed font-sans">
+              {explanation_text}
+            </p>
           )}
-          {!is_toxic && (
-            <p className="text-white/60 text-sm leading-relaxed">{explanation_text}</p>
-          )}
-          <div className="h-64">
+
+          <div className="h-56 bg-[#ffffff] p-2">
             <NutrientRadar features={graph_features} compact />
           </div>
         </div>
@@ -88,32 +83,36 @@ export default function CategoryResult({ data }) {
   }, {});
 
   return (
-    <div className="space-y-6 animate-fade-in">
-      {/* Header */}
-      <div className="p-6 rounded-2xl bg-white/5 border border-white/10">
-        <div className="flex flex-wrap items-start gap-4">
+    <div className="space-y-6">
+      {/* Category Header */}
+      <div className="card-floating space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-2xl font-extrabold text-white">
-              {category} <span className="text-white/40">for</span> {species}
+            <span className="text-xs text-[#979799] uppercase tracking-wider block">
+              Category Comparative Evaluation
+            </span>
+            <h2 className="text-2xl font-serif text-[#17191c] mt-0.5">
+              {category} for {species}
             </h2>
-            <p className="text-sm text-white/40 mt-1 capitalize">
-              Diet type: {diet_type} · Showing top {results.length} foods by bioavailability
+            <p className="text-xs text-[#777b86] mt-0.5 capitalize">
+              Diet biology: {diet_type} · Ranked by bioavailability
             </p>
           </div>
-          <div className="ml-auto flex flex-wrap gap-2">
-            {Object.entries(gradeCount).map(([g, c]) => {
-              const gc = GRADE_COLORS[g] || GRADE_COLORS.C;
-              return (
-                <span key={g} className={`px-3 py-1 rounded-full text-xs font-bold text-white bg-gradient-to-r ${gc.bg}`}>
-                  Grade {g}: {c}
-                </span>
-              );
-            })}
+
+          <div className="flex flex-wrap gap-1.5">
+            {Object.entries(gradeCount).map(([g, c]) => (
+              <span
+                key={g}
+                className="px-3 py-1 rounded-full text-xs font-mono bg-[#f2f2f3] text-[#17191c]"
+              >
+                Grade {g}: {c}
+              </span>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Food cards */}
+      {/* Results List */}
       <div className="space-y-3">
         {sortedResults.map((item, i) => (
           <MiniCard
@@ -125,8 +124,8 @@ export default function CategoryResult({ data }) {
         ))}
       </div>
 
-      <p className="text-xs text-white/25 text-center">
-        Results sorted by health grade · Click each card to expand nutritional details
+      <p className="text-xs text-[#a3a6af] text-center font-sans">
+        Click any food item above to expand detailed radar charts.
       </p>
     </div>
   );

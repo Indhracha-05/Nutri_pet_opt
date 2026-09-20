@@ -3,56 +3,28 @@ import axios from 'axios';
 
 const API_BASE = "http://localhost:8000";
 
-const DIET_ICONS = {
-  carnivore: "🥩",
-  herbivore: "🌿",
-  omnivore: "🍽️"
-};
-
-const SPECIES_ICONS = {
-  "Dog": "🐶",
-  "Cat": "🐱",
-  "Rabbit": "🐰",
-  "Hamster": "🐹",
-  "Guinea Pig": "🐹",
-  "Ferret": "🦡",
-  "Bird": "🦜",
-  "Horse": "🐴",
-  "Fish": "🐟",
-  "Turtle": "🐢"
-};
-
-const CATEGORY_ICONS = {
-  "Meat": "🥩", "Seafood": "🐟", "Dairy/Egg": "🥚",
-  "Vegetable": "🥦", "Fruit": "🍎", "Grain/Bean": "🌾",
-  "Seed/Nut": "🌰", "Other": "🧪", "Toxic": "☠️"
-};
-
-// Diet type -> standard allowed categories
-const DIET_CATEGORY_MAP = {
-  carnivore: ["Meat", "Seafood", "Dairy/Egg", "Other", "Toxic"],
-  herbivore: ["Vegetable", "Fruit", "Grain/Bean", "Seed/Nut", "Other", "Toxic"],
-  omnivore: ["Meat", "Seafood", "Dairy/Egg", "Vegetable", "Fruit", "Grain/Bean", "Seed/Nut", "Other", "Toxic"],
-};
-
-// Known toxic foods to always include regardless of diet type
 const ALWAYS_INCLUDED_FOODS = [
   "Chocolate (Dark)", "Chocolate (Milk)", "Garlic", "Onion (Raw)",
   "Grapes", "Raisins", "Avocado", "Xylitol", "Macadamia Nuts", "Alcohol", "Caffeine"
 ];
 
-// Popular quick-test foods for 1-click testing (Safe + Toxic test cases)
 const QUICK_TEST_FOODS = [
-  { name: "Chicken Breast", icon: "🍗", isToxic: false },
-  { name: "Salmon", icon: "🐟", isToxic: false },
-  { name: "Beef", icon: "🥩", isToxic: false },
-  { name: "Broccoli", icon: "🥦", isToxic: false },
-  { name: "Apple", icon: "🍎", isToxic: false },
-  { name: "Chocolate (Dark)", icon: "🍫", isToxic: true },
-  { name: "Garlic", icon: "🧄", isToxic: true },
-  { name: "Grapes", icon: "🍇", isToxic: true },
-  { name: "Avocado", icon: "🥑", isToxic: true },
+  { name: "Chicken Breast", isToxic: false },
+  { name: "Salmon", isToxic: false },
+  { name: "Beef", isToxic: false },
+  { name: "Broccoli", isToxic: false },
+  { name: "Apple", isToxic: false },
+  { name: "Chocolate (Dark)", isToxic: true },
+  { name: "Garlic", isToxic: true },
+  { name: "Grapes", isToxic: true },
+  { name: "Avocado", isToxic: true },
 ];
+
+const DIET_CATEGORY_MAP = {
+  carnivore: ["Meat", "Seafood", "Dairy/Egg", "Other", "Toxic"],
+  herbivore: ["Vegetable", "Fruit", "Grain/Bean", "Seed/Nut", "Other", "Toxic"],
+  omnivore: ["Meat", "Seafood", "Dairy/Egg", "Vegetable", "Fruit", "Grain/Bean", "Seed/Nut", "Other", "Toxic"],
+};
 
 export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
   const [speciesList, setSpeciesList] = useState([]);
@@ -61,28 +33,23 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
   const [allCategories, setAllCategories] = useState([]);
   const [fetchError, setFetchError] = useState(null);
 
-  // Selected values
   const [selectedSpeciesName, setSelectedSpeciesName] = useState('');
   const [selectedFoodName, setSelectedFoodName] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [mode, setMode] = useState('specific'); // 'specific' | 'category'
 
-  // Typable input text states
   const [speciesQuery, setSpeciesQuery] = useState('');
   const [foodQuery, setFoodQuery] = useState('');
 
-  // Dropdown open states
   const [isSpeciesOpen, setIsSpeciesOpen] = useState(false);
   const [isFoodOpen, setIsFoodOpen] = useState(false);
 
-  // Active keyboard highlight index
   const [speciesHighlight, setSpeciesHighlight] = useState(0);
   const [foodHighlight, setFoodHighlight] = useState(0);
 
   const speciesBoxRef = useRef(null);
   const foodBoxRef = useRef(null);
 
-  // Initial Fetch
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -119,7 +86,6 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
   const dietType = selectedSpecies?.digestive_type?.toLowerCase() || 'omnivore';
   const allowedCats = DIET_CATEGORY_MAP[dietType] || DIET_CATEGORY_MAP.omnivore;
 
-  // Filter foods whenever species changes (Respects veg/non-veg diet + always retains toxic items)
   useEffect(() => {
     if (!selectedSpeciesName) return;
 
@@ -133,7 +99,6 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
 
     setFilteredFoods(filtered);
 
-    // If current selected food is not compatible with new species diet, switch to first compatible food
     if (filtered.length > 0 && (!selectedFoodName || !filtered.find(f => f.name.toLowerCase() === selectedFoodName.toLowerCase()))) {
       setSelectedFoodName(filtered[0].name);
       setFoodQuery(filtered[0].name);
@@ -144,7 +109,6 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
     }
   }, [selectedSpeciesName, allFoods, dietType]);
 
-  // Click outside listener to close suggestion dropdowns
   useEffect(() => {
     function handleClickOutside(event) {
       if (speciesBoxRef.current && !speciesBoxRef.current.contains(event.target)) {
@@ -158,19 +122,16 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filtered lists for typable inputs
   const matchingSpecies = speciesList.filter(s =>
     s.name.toLowerCase().includes(speciesQuery.toLowerCase().trim()) ||
     s.digestive_type.toLowerCase().includes(speciesQuery.toLowerCase().trim())
   );
 
-  // Search within filteredFoods first, or fallback to allFoods if user types a specific query
   const matchingFoods = (foodQuery.trim() ? allFoods : filteredFoods).filter(f =>
     f.name.toLowerCase().includes(foodQuery.toLowerCase().trim()) ||
     f.category.toLowerCase().includes(foodQuery.toLowerCase().trim())
   );
 
-  // Selection handlers
   const handleSelectSpecies = (species) => {
     setSelectedSpeciesName(species.name);
     setSpeciesQuery(species.name);
@@ -183,7 +144,6 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
     setIsFoodOpen(false);
   };
 
-  // Keyboard navigation for Species input
   const handleSpeciesKeyDown = (e) => {
     if (!isSpeciesOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       setIsSpeciesOpen(true);
@@ -205,7 +165,6 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
     }
   };
 
-  // Keyboard navigation for Food input
   const handleFoodKeyDown = (e) => {
     if (!isFoodOpen && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
       setIsFoodOpen(true);
@@ -243,45 +202,45 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
 
   if (fetchError) {
     return (
-      <div className="p-4 rounded-xl bg-red-900/20 border border-red-500/30 text-red-300 text-sm">
-        <p className="font-bold mb-1">❌ Connection Error</p>
-        <p>{fetchError}</p>
-        <p className="mt-2 text-xs opacity-70">Check if the backend is running on port 8000.</p>
+      <div className="p-4 rounded-inputs bg-[#fbe1d1] text-[#5d2a1a] text-xs">
+        <p className="font-bold">Database Error</p>
+        <p className="mt-1">{fetchError}</p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Mode Switcher */}
-      <div className="flex rounded-xl overflow-hidden border border-white/10 p-1 bg-white/5">
+    <form onSubmit={handleSubmit} className="space-y-6">
+      {/* Pill Mode Switcher */}
+      <div className="flex bg-[#f2f2f3] p-1 rounded-full">
         <button
           type="button"
           onClick={() => setMode('specific')}
-          className={`flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${mode === 'specific'
-              ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
-              : 'text-white/40 hover:text-white/70'
-            }`}
+          className={`flex-1 py-1.5 text-xs font-sans rounded-full transition-all ${
+            mode === 'specific'
+              ? 'bg-[#17191c] text-[#ffffff]'
+              : 'text-[#777b86] hover:text-[#17191c]'
+          }`}
         >
-          Specific Food
+          Single Food
         </button>
         <button
           type="button"
           onClick={() => setMode('category')}
-          className={`flex-1 py-1.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${mode === 'category'
-              ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
-              : 'text-white/40 hover:text-white/70'
-            }`}
+          className={`flex-1 py-1.5 text-xs font-sans rounded-full transition-all ${
+            mode === 'category'
+              ? 'bg-[#17191c] text-[#ffffff]'
+              : 'text-[#777b86] hover:text-[#17191c]'
+          }`}
         >
-          Branch Analysis
+          Category Search
         </button>
       </div>
 
-      {/* BOX 1: TYPABLE PET SPECIES */}
-      <div ref={speciesBoxRef} className="relative">
-        <label className="block text-xs font-bold uppercase tracking-widest text-purple-300 mb-2 flex items-center justify-between">
-          <span className="flex items-center gap-1.5">🐾 Pet Species</span>
-          <span className="text-[10px] text-white/40 lowercase">type to search</span>
+      {/* SPECIES SELECTION */}
+      <div ref={speciesBoxRef} className="relative space-y-1.5">
+        <label className="block text-xs font-sans text-[#777b86]">
+          Pet Species
         </label>
 
         <div className="relative">
@@ -295,12 +254,11 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
             }}
             onFocus={() => setIsSpeciesOpen(true)}
             onKeyDown={handleSpeciesKeyDown}
-            placeholder="Type species (e.g. Dog, Cat, Rabbit, Horse)..."
-            className="w-full px-4 py-3 pr-10 rounded-xl bg-gray-900 border border-white/20 text-white placeholder-white/30 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 text-sm transition-all"
+            placeholder="Type species (e.g. Dog, Cat, Rabbit)..."
+            className="steep-input"
           />
 
-          {/* Dropdown Toggle / Clear Icon */}
-          <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-1">
+          <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2 text-xs text-[#a3a6af]">
             {speciesQuery && (
               <button
                 type="button"
@@ -308,7 +266,7 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
                   setSpeciesQuery('');
                   setIsSpeciesOpen(true);
                 }}
-                className="text-white/30 hover:text-white/70 text-xs px-1"
+                className="hover:text-[#17191c]"
               >
                 ✕
               </button>
@@ -316,20 +274,18 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
             <button
               type="button"
               onClick={() => setIsSpeciesOpen(!isSpeciesOpen)}
-              className="text-white/40 hover:text-white/70 p-1"
+              className="hover:text-[#17191c]"
             >
-              <svg className={`w-4 h-4 transition-transform ${isSpeciesOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-              </svg>
+              ▾
             </button>
           </div>
         </div>
 
         {/* Species Suggestions Popup */}
         {isSpeciesOpen && (
-          <div className="absolute z-50 left-0 right-0 mt-1 max-h-56 overflow-y-auto rounded-xl bg-gray-900 border border-purple-500/40 backdrop-blur-xl shadow-2xl divide-y divide-white/5 animate-fade-in">
+          <div className="absolute z-50 left-0 right-0 mt-2 max-h-56 overflow-y-auto bg-[#ffffff] border border-[#ececec] rounded-inputs shadow-subtle divide-y divide-[#ececec]">
             {matchingSpecies.length === 0 ? (
-              <div className="p-3 text-center text-white/40 text-xs">
+              <div className="p-3 text-center text-[#a3a6af] text-xs">
                 No species matching "{speciesQuery}"
               </div>
             ) : (
@@ -341,21 +297,19 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
                     key={s.species_id}
                     onClick={() => handleSelectSpecies(s)}
                     onMouseEnter={() => setSpeciesHighlight(idx)}
-                    className={`px-4 py-2.5 cursor-pointer flex items-center justify-between text-sm transition-colors ${isSelected
-                        ? 'bg-purple-600/30 text-white font-bold'
+                    className={`px-4 py-2.5 cursor-pointer flex items-center justify-between text-sm ${
+                      isSelected
+                        ? 'bg-[#f2f2f3] text-[#17191c] font-medium'
                         : isHighlighted
-                          ? 'bg-white/10 text-white'
-                          : 'text-white/80 hover:bg-white/5'
-                      }`}
+                        ? 'bg-[#fafafb] text-[#17191c]'
+                        : 'text-[#17191c] hover:bg-[#fafafb]'
+                    }`}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <span className="text-base">{SPECIES_ICONS[s.name] || DIET_ICONS[s.digestive_type?.toLowerCase()] || '🐾'}</span>
+                    <div className="flex items-center gap-2">
                       <span>{s.name}</span>
-                      <span className="text-xs text-white/40 capitalize">({s.digestive_type})</span>
+                      <span className="text-xs text-[#979799] capitalize">({s.digestive_type})</span>
                     </div>
-                    {isSelected && (
-                      <span className="text-xs text-purple-300 font-bold">✓</span>
-                    )}
+                    {isSelected && <span className="text-xs text-[#17191c]">✓</span>}
                   </div>
                 );
               })
@@ -363,24 +317,23 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
           </div>
         )}
 
-        {/* Diet Compatibility Badge */}
         {selectedSpecies && (
-          <div className="mt-2 flex items-center justify-between px-3 py-1.5 rounded-lg bg-purple-500/10 border border-purple-500/20 text-xs">
-            <span className="text-purple-300 font-bold uppercase flex items-center gap-1.5">
-              <span>{DIET_ICONS[dietType] || '🍽️'}</span>
-              <span>{dietType}</span>
+          <div className="p-3 rounded-inputs bg-[#f2f2f3] flex items-center justify-between text-xs text-[#777b86]">
+            <span className="capitalize text-[#17191c]">
+              {selectedSpecies.digestive_type} Diet
             </span>
-            <span className="text-white/40">{filteredFoods.length} compatible & test foods</span>
+            <span>
+              {filteredFoods.length} compatible foods
+            </span>
           </div>
         )}
       </div>
 
-      {/* BOX 2: TYPABLE FOOD ITEM (SPECIFIC MODE) */}
+      {/* FOOD ITEM SELECTION */}
       {mode === 'specific' && (
-        <div ref={foodBoxRef} className="relative space-y-2">
-          <label className="block text-xs font-bold uppercase tracking-widest text-purple-300 mb-1 flex items-center justify-between">
-            <span className="flex items-center gap-1.5">🍽️ Food Item</span>
-            <span className="text-[10px] text-white/40 lowercase">type to search & match</span>
+        <div ref={foodBoxRef} className="relative space-y-1.5">
+          <label className="block text-xs font-sans text-[#777b86]">
+            Food Ingredient
           </label>
 
           <div className="relative">
@@ -394,12 +347,11 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
               }}
               onFocus={() => setIsFoodOpen(true)}
               onKeyDown={handleFoodKeyDown}
-              placeholder="Type food (e.g. Salmon, Chicken, Chocolate, Garlic)..."
-              className="w-full px-4 py-3 pr-10 rounded-xl bg-gray-900 border border-white/20 text-white placeholder-white/30 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-400/30 text-sm transition-all"
+              placeholder="Search ingredient (e.g. Chicken, Salmon, Chocolate)..."
+              className="steep-input"
             />
 
-            {/* Dropdown Toggle / Clear Icon */}
-            <div className="absolute inset-y-0 right-0 pr-3 flex items-center gap-1">
+            <div className="absolute inset-y-0 right-0 pr-4 flex items-center gap-2 text-xs text-[#a3a6af]">
               {foodQuery && (
                 <button
                   type="button"
@@ -407,7 +359,7 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
                     setFoodQuery('');
                     setIsFoodOpen(true);
                   }}
-                  className="text-white/30 hover:text-white/70 text-xs px-1"
+                  className="hover:text-[#17191c]"
                 >
                   ✕
                 </button>
@@ -415,20 +367,18 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
               <button
                 type="button"
                 onClick={() => setIsFoodOpen(!isFoodOpen)}
-                className="text-white/40 hover:text-white/70 p-1"
+                className="hover:text-[#17191c]"
               >
-                <svg className={`w-4 h-4 transition-transform ${isFoodOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                </svg>
+                ▾
               </button>
             </div>
           </div>
 
           {/* Food Suggestions Popup */}
           {isFoodOpen && (
-            <div className="absolute z-50 left-0 right-0 mt-1 max-h-64 overflow-y-auto rounded-xl bg-gray-900 border border-purple-500/40 backdrop-blur-xl shadow-2xl divide-y divide-white/5 animate-fade-in">
+            <div className="absolute z-50 left-0 right-0 mt-2 max-h-60 overflow-y-auto bg-[#ffffff] border border-[#ececec] rounded-inputs shadow-subtle divide-y divide-[#ececec]">
               {matchingFoods.length === 0 ? (
-                <div className="p-3 text-center text-white/40 text-xs">
+                <div className="p-3 text-center text-[#a3a6af] text-xs">
                   No foods matching "{foodQuery}"
                 </div>
               ) : (
@@ -442,32 +392,28 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
                       key={f.food_id}
                       onClick={() => handleSelectFood(f)}
                       onMouseEnter={() => setFoodHighlight(idx)}
-                      className={`px-4 py-2.5 cursor-pointer flex items-center justify-between text-sm transition-colors ${isSelected
-                          ? 'bg-purple-600/30 text-white font-bold'
+                      className={`px-4 py-2.5 cursor-pointer flex items-center justify-between text-sm ${
+                        isSelected
+                          ? 'bg-[#f2f2f3] text-[#17191c] font-medium'
                           : isHighlighted
-                            ? 'bg-white/10 text-white'
-                            : 'text-white/80 hover:bg-white/5'
-                        }`}
+                          ? 'bg-[#fafafb] text-[#17191c]'
+                          : 'text-[#17191c] hover:bg-[#fafafb]'
+                      }`}
                     >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <span className="text-base flex-shrink-0">{CATEGORY_ICONS[f.category] || '🍴'}</span>
-                        <div className="truncate">
-                          <div className="flex items-center gap-1.5">
-                            <p className="truncate font-medium">{f.name}</p>
-                            {isToxicItem && (
-                              <span className="text-[10px] px-1.5 py-0.2 rounded bg-red-500/20 text-red-300 border border-red-500/30">
-                                ☠ Toxin Test
-                              </span>
-                            )}
-                          </div>
-                          <p className="text-[11px] text-white/40">
-                            {f.category} · {f.calories} kcal · {f.protein_g}g protein
-                          </p>
+                      <div className="min-w-0 pr-2">
+                        <div className="flex items-center gap-2">
+                          <p className="truncate font-medium">{f.name}</p>
+                          {isToxicItem && (
+                            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#fbe1d1] text-[#5d2a1a]">
+                              Toxin Test
+                            </span>
+                          )}
                         </div>
+                        <p className="text-xs text-[#979799]">
+                          {f.category} · {f.calories} kcal · {f.protein_g}g protein
+                        </p>
                       </div>
-                      {isSelected && (
-                        <span className="text-xs text-purple-300 font-bold ml-2 flex-shrink-0">✓</span>
-                      )}
+                      {isSelected && <span className="text-xs text-[#17191c]">✓</span>}
                     </div>
                   );
                 })
@@ -475,15 +421,13 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
             </div>
           )}
 
-          {/* Quick-Test Suggestions Pills (Safe + Toxic test items) */}
-          <div className="pt-1">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-white/40">
-                ⚡ Quick Test Foods:
-              </span>
-            </div>
+          {/* Quick-Test Items */}
+          <div className="pt-2 space-y-2">
+            <span className="text-xs text-[#979799] block font-sans">
+              Quick Test Candidates:
+            </span>
             <div className="flex flex-wrap gap-1.5">
-              {QUICK_TEST_FOODS.map(f => {
+              {QUICK_TEST_FOODS.map((f) => {
                 const isSelected = selectedFoodName.toLowerCase() === f.name.toLowerCase();
                 return (
                   <button
@@ -497,16 +441,10 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
                         setFoodQuery(f.name);
                       }
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all flex items-center gap-1 border ${isSelected
-                        ? 'bg-purple-600 border-purple-400 text-white shadow-md'
-                        : !f.isToxic
-                          ? 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
-                          : 'bg-red-500/10 border-red-500/25 text-red-300/90 hover:bg-red-500/20 hover:text-red-200'
-                      }`}
+                    className={`chip-pill ${isSelected ? 'selected' : ''} ${f.isToxic && !isSelected ? 'text-[#5d2a1a] bg-[#fbe1d1]/50 border-[#fbe1d1]' : ''}`}
                   >
-                    <span>{f.icon}</span>
                     <span>{f.name}</span>
-                    {f.isToxic && <span className="text-[9px] text-red-400 font-bold">⚠️</span>}
+                    {f.isToxic && <span className="text-[10px] text-[#5d2a1a]">!</span>}
                   </button>
                 );
               })}
@@ -515,11 +453,11 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
         </div>
       )}
 
-      {/* CATEGORY GRID (BRANCH MODE) */}
+      {/* CATEGORY GRID */}
       {mode === 'category' && (
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-widest text-purple-300 mb-2 flex items-center gap-2">
-            🗂️ Food Category
+        <div className="space-y-2">
+          <label className="block text-xs font-sans text-[#777b86]">
+            Food Category
           </label>
           <div className="grid grid-cols-2 gap-2">
             {allCategories.filter(c => allowedCats.includes(c)).map(cat => (
@@ -527,13 +465,13 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
                 key={cat}
                 type="button"
                 onClick={() => setSelectedCategory(cat)}
-                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${selectedCategory === cat
-                    ? 'bg-purple-600 border-purple-400 text-white shadow-lg shadow-purple-500/30'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'
-                  }`}
+                className={`p-3 text-left rounded-inputs text-xs font-sans transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-[#17191c] text-[#ffffff]'
+                    : 'bg-[#f2f2f3] text-[#17191c] hover:bg-[#eaeaea]'
+                }`}
               >
-                <span>{CATEGORY_ICONS[cat] || '🍴'}</span>
-                <span>{cat}</span>
+                {cat}
               </button>
             ))}
           </div>
@@ -544,19 +482,10 @@ export default function InputForm({ onAnalyze, onCategoryAnalyze, isLoading }) {
       <button
         type="submit"
         disabled={isLoading || (mode === 'category' ? !selectedCategory : (!selectedFoodName && !foodQuery))}
-        className={`w-full py-4 px-6 rounded-xl font-bold text-sm tracking-widest uppercase transition-all duration-200 flex items-center justify-center gap-2 ${isLoading
-            ? 'bg-gray-700 cursor-not-allowed text-gray-400'
-            : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white shadow-xl shadow-purple-500/20 hover:shadow-purple-400/40 hover:-translate-y-0.5 cursor-pointer'
-          }`}
+        className="btn-pill-filled w-full py-3.5 text-sm"
       >
-        {isLoading ? "Running AI..." : "🚀 Run AI Analysis"}
+        {isLoading ? "Analyzing..." : "Evaluate Ingredient →"}
       </button>
-
-      {speciesList.length === 0 && !fetchError && (
-        <p className="text-[10px] text-white/30 text-center animate-pulse">
-          Connecting to database...
-        </p>
-      )}
     </form>
   );
 }

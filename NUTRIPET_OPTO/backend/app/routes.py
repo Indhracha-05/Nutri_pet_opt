@@ -54,9 +54,9 @@ def load_resources():
     caloric_path = os.path.join(ML_DIR, "caloric_model.pkl")
     if os.path.exists(caloric_path):
         CALORIC_MODEL = joblib.load(caloric_path)
-        print(f"✅ Loaded Caloric Model from {caloric_path}")
+        print(f"[OK] Loaded Caloric Model from {caloric_path}")
     else:
-        print("⚠️ Caloric Model not found. Using heuristic fallback.")
+        print("[WARN] Caloric Model not found. Using heuristic fallback.")
 
     # Build Graph
     try:
@@ -69,9 +69,9 @@ def load_resources():
             foods_df.to_dict("records"),
             toxicity_df.to_dict("records")
         )
-        print(f"✅ Built Knowledge Graph: {GRAPH.number_of_nodes()} nodes")
+        print(f"[OK] Built Knowledge Graph: {GRAPH.number_of_nodes()} nodes")
     except Exception as e:
-        print(f"❌ Failed to build graph: {e}")
+        print(f"[ERROR] Failed to build graph: {e}")
 
 
 load_resources()

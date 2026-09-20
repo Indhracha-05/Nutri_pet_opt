@@ -44,23 +44,24 @@ export default function NutrientRadar({ features, compact }) {
         labels: labels,
         datasets: [
             {
-                label: 'Compatibility',
+                label: 'Ingredient Score',
                 data: dataValues,
-                backgroundColor: 'rgba(168, 85, 247, 0.2)',
-                borderColor: 'rgba(168, 85, 247, 1)',
-                borderWidth: 2,
-                pointBackgroundColor: 'rgba(168, 85, 247, 1)',
-                pointBorderColor: '#fff',
+                backgroundColor: 'rgba(120, 113, 108, 0.15)',
+                borderColor: '#78716C',
+                borderWidth: 1.5,
+                pointBackgroundColor: '#78716C',
+                pointBorderColor: '#FAFAF9',
                 pointBorderWidth: 1,
+                pointRadius: 3,
             },
             {
-                label: 'Ideal Limit',
+                label: 'Optimal Threshold',
                 data: [1, 1, 1, 1, 1, 1],
-                backgroundColor: 'rgba(16, 185, 129, 0.0)',
-                borderColor: 'rgba(16, 185, 129, 0.3)',
+                backgroundColor: 'transparent',
+                borderColor: '#65A30D',
                 borderWidth: 1,
                 pointRadius: 0,
-                borderDash: [5, 5],
+                borderDash: [4, 4],
             }
         ],
     };
@@ -70,14 +71,14 @@ export default function NutrientRadar({ features, compact }) {
         maintainAspectRatio: false,
         scales: {
             r: {
-                angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
-                grid: { color: 'rgba(255, 255, 255, 0.08)' },
-                ticks: { display: false, maxTicksLimit: 6 },
+                angleLines: { color: '#E7E5E4' },
+                grid: { color: '#E7E5E4' },
+                ticks: { display: false, maxTicksLimit: 5 },
                 suggestedMin: 0,
                 suggestedMax: 1,
                 pointLabels: {
-                    font: { size: compact ? 9 : 11, weight: 'bold' },
-                    color: 'rgba(255, 255, 255, 0.6)'
+                    font: { size: compact ? 9 : 11, family: 'Inter', weight: '500' },
+                    color: '#57534E'
                 }
             },
         },
@@ -86,9 +87,10 @@ export default function NutrientRadar({ features, compact }) {
                 display: !compact,
                 position: 'bottom',
                 labels: {
-                    boxWidth: 10,
-                    padding: 15,
-                    color: 'rgba(255, 255, 255, 0.6)'
+                    boxWidth: 8,
+                    padding: 12,
+                    color: '#57534E',
+                    font: { size: 11, family: 'Inter' }
                 }
             },
         }
@@ -103,9 +105,8 @@ export default function NutrientRadar({ features, compact }) {
     }
 
     return (
-        <div className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col h-full">
-            <h3 className="text-base font-bold text-white/80 mb-3 text-center">Compatibility Radar</h3>
-            <div className="flex-grow min-h-[250px]">
+        <div className="w-full h-full flex flex-col items-center justify-center">
+            <div className="w-full h-[220px]">
                 <Radar data={data} options={options} />
             </div>
         </div>
