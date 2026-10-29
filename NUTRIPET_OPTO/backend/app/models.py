@@ -71,3 +71,72 @@ class Toxicity(Base):
 
     def __repr__(self):
         return f"<Toxicity(species={self.species_id}, food={self.food_id}, compound='{self.toxic_compound}')>"
+
+
+class Pet(Base):
+    """Registered pet profile."""
+    __tablename__ = "pets"
+
+    pet_id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(100), nullable=False, index=True)
+    species_name = Column(String(100), nullable=False)
+    breed = Column(String(100), nullable=True)
+    age_years = Column(Float, nullable=True)
+    weight_kg = Column(Float, nullable=False, default=5.0)
+    activity_level = Column(String(50), nullable=False, default="normal")  # inactive, normal, active, working
+    avatar_emoji = Column(String(20), nullable=True, default="🐾")
+    allergies_sensitivities = Column(Text, nullable=True)
+    medical_notes = Column(Text, nullable=True)
+    created_at = Column(String(50), nullable=True)
+
+    diets = relationship("PetDiet", back_populates="pet", cascade="all, delete-orphan", order_by="desc(PetDiet.diet_id)")
+    vet_visits = relationship("VetVisit", back_populates="pet", cascade="all, delete-orphan", order_by="desc(VetVisit.visit_date)")
+
+    def __repr__(self):
+        return f"<Pet(id={self.pet_id}, name='{self.name}', species='{self.species_name}')>"
+
+
+class PetDiet(Base):
+    """Dietary regimen for a specific pet."""
+    __tablename__ = "pet_diets"
+
+    diet_id = Column(Integer, primary_key=True, autoincrement=True)
+    pet_id = Column(Integer, ForeignKey("pets.pet_id"), nullable=False)
+    diet_name = Column(String(200), nullable=False)
+    diet_type = Column(String(50), nullable=False, default="Mixed")  # Raw, Wet, Dry Kibble, Home-Cooked, Mixed, Prescription
+    daily_calories_target = Column(Float, nullable=True)
+    meals_per_day = Column(Integer, default=2)
+    schedule_time = Column(String(100), nullable=True)
+    ingredients_json = Column(Text, nullable=True)  # JSON or text description of food portions
+    is_active = Column(Integer, default=1)  # 1 = active, 0 = inactive (SQLite friendly)
+    notes = Column(Text, nullable=True)
+    created_at = Column(String(50), nullable=True)
+
+    pet = relationship("Pet", back_populates="diets")
+
+    def __repr__(self):
+        return f"<PetDiet(id={self.diet_id}, pet_id={self.pet_id}, name='{self.diet_name}')>"
+
+
+class VetVisit(Base):
+    """Veterinary visit and clinical record for a pet."""
+    __tablename__ = "vet_visits"
+
+    visit_id = Column(Integer, primary_key=True, autoincrement=True)
+    pet_id = Column(Integer, ForeignKey("pets.pet_id"), nullable=False)
+    visit_date = Column(String(50), nullable=False)  # ISO Date e.g. "2026-10-20"
+    reason = Column(String(200), nullable=False)     # e.g. "Annual Wellness Checkup", "Vaccination Booster"
+    clinic_name = Column(String(200), nullable=True)
+    veterinarian = Column(String(100), nullable=True)
+    weight_kg = Column(Float, nullable=True)
+    diagnosis = Column(Text, nullable=True)
+    treatment_plan = Column(Text, nullable=True)
+    medications = Column(Text, nullable=True)
+    next_visit_date = Column(String(50), nullable=True)
+    cost_usd = Column(Float, nullable=True)
+    created_at = Column(String(50), nullable=True)
+
+    pet = relationship("Pet", back_populates="vet_visits")
+
+    def __repr__(self):
+        return f"<VetVisit(id={self.visit_id}, pet_id={self.pet_id}, date='{self.visit_date}')>"

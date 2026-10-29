@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import NotificationCenter from '../components/NotificationCenter';
 
 const features = [
   {
@@ -25,6 +26,14 @@ const features = [
     description:
       'Formulate day-by-day raw feeding schedules calibrated to species resting energy requirements and activity targets down to the gram.',
     route: '/analyzer',
+  },
+  {
+    id: 'pets',
+    category: 'Clinical Pet Registry',
+    title: 'Pet Profiles, Diets & Vet Visits',
+    description:
+      'Register personalized pet profiles, formulate & track active daily feeding regimens, and log clinical veterinary checkup timelines.',
+    route: '/pets',
   },
 ];
 
@@ -73,16 +82,23 @@ export default function HomePage() {
 
         <div className="flex items-center gap-4">
           <button
-            onClick={() => navigate('/analyzer')}
-            className="text-sm text-[#777b86] hover:text-[#17191c] transition-colors hidden sm:inline"
+            onClick={() => navigate('/pets')}
+            className="text-sm text-[#777b86] hover:text-[#17191c] transition-colors"
           >
-            How it works
+            Pet Profiles & Diets
           </button>
           <button
             onClick={() => navigate('/analyzer')}
+            className="text-sm text-[#777b86] hover:text-[#17191c] transition-colors hidden sm:inline"
+          >
+            Food Analyzer
+          </button>
+          <NotificationCenter />
+          <button
+            onClick={() => navigate('/pets')}
             className="btn-pill-filled text-sm"
           >
-            Launch Analyzer
+            Manage Pet Care →
           </button>
         </div>
       </nav>
@@ -100,24 +116,21 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg md:text-xl text-[#777b86] max-w-2xl mx-auto leading-relaxed">
-            NutriPet combines structured biochemical knowledge graphs with veterinary machine learning to grade ingredients, uncover fatal toxicity risks, and formulate balanced daily rations.
+            NutriPet combines structured biochemical knowledge graphs with veterinary machine learning to grade ingredients, track customized feeding regimens, log veterinary care timelines, and protect multi-pet households.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
             <button
-              onClick={() => navigate('/analyzer')}
+              onClick={() => navigate('/pets')}
               className="btn-pill-filled text-base px-7 py-3"
             >
-              Start Analysis →
+              Pet Profiles & Records →
             </button>
             <button
-              onClick={() => {
-                const el = document.getElementById('features');
-                if (el) el.scrollIntoView({ behavior: 'smooth' });
-              }}
+              onClick={() => navigate('/analyzer')}
               className="btn-pill-ghost text-base px-7 py-3"
             >
-              Explore Capabilities
+              Analyze Ingredients
             </button>
           </div>
 

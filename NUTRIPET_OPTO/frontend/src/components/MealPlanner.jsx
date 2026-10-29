@@ -228,17 +228,72 @@ export default function MealPlanner({ species }) {
   const [mealsPerDay, setMealsPerDay] = useState(2);
   const [allFoods, setAllFoods] = useState([]);
 
+  // Pet Profile Integration
+  const [petsList, setPetsList] = useState([]);
+  const [selectedPetId, setSelectedPetId] = useState("");
+  const [saveStatus, setSaveStatus] = useState(null);
+
   const [plan, setPlan] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     axios.get(`${API_BASE}/foods`).then(r => setAllFoods(r.data.map(f => f.name))).catch(() => { });
+    axios.get(`${API_BASE}/pets`).then(r => setPetsList(r.data)).catch(() => { });
   }, []);
 
   useEffect(() => {
     if (species?.length && !selectedSpecies) setSelectedSpecies(species[0].name);
   }, [species]);
+
+  const handleSelectPet = (id) => {
+    setSelectedPetId(id);
+    if (!id) return;
+    const pet = petsList.find(p => p.pet_id === parseInt(id));
+    if (pet) {
+      setSelectedSpecies(pet.species_name);
+      setWeightKg(pet.weight_kg);
+      setWeightUnit("kg");
+      setActivityLevel(pet.activity_level || "normal");
+    }
+  };
+
+  const handleSavePlanToPet = async () => {
+    if (!selectedPetId) {
+      alert("Please select a pet profile to save this diet to.");
+      return;
+    }
+    const pet = petsList.find(p => p.pet_id === parseInt(selectedPetId));
+    if (!pet || !plan) return;
+
+    setSaveStatus("saving");
+    try {
+      const day1 = plan.daily_plans?.[0];
+      const portions = day1?.ingredients?.map(ing => ({
+        food_name: ing.food_name,
+        category: ing.category,
+        grams: ing.grams,
+        calories: ing.calories
+      })) || [];
+
+      await axios.post(`${API_BASE}/pets/${pet.pet_id}/diets`, {
+        diet_name: `${pet.name}'s Calibrated ${plan.days_planned}-Day Regimen`,
+        diet_type: "Raw",
+        daily_calories_target: plan.daily_target_calories,
+        meals_per_day: plan.meals_per_day,
+        schedule_time: "Morning & Evening Portions",
+        ingredients_json: JSON.stringify(portions),
+        is_active: true,
+        notes: `Formulated by Smart Meal Planner. RER: ${Math.round(plan.rer_kcal)} kcal, MER: ${Math.round(plan.mer_kcal)} kcal. Target: ${Math.round(plan.daily_target_calories)} kcal/day.`
+      });
+      setSaveStatus("saved");
+      setTimeout(() => setSaveStatus(null), 4000);
+    } catch (err) {
+      console.error(err);
+      setSaveStatus("error");
+      setTimeout(() => setSaveStatus(null), 4000);
+    }
+  };
 
   const weightKgActual = weightUnit === "lbs" ? weightKg * 0.453592 : weightKg;
 
@@ -283,6 +338,31 @@ export default function MealPlanner({ species }) {
               Biological Targets
             </h2>
           </div>
+
+          {/* Auto-Fill from Pet Profile */}
+          {petsList.length > 0 && (
+            <div className="space-y-1.5 p-3 rounded-inputs bg-[#fafafb] border border-[#ececec]">
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-semibold text-[#17191c] flex items-center gap-1">
+                  <span>🐾</span>
+                  <span>Auto-Fill from Pet Profile</span>
+                </label>
+                <span className="text-[10px] text-[#777b86]">Optional</span>
+              </div>
+              <select
+                value={selectedPetId}
+                onChange={e => handleSelectPet(e.target.value)}
+                className="w-full px-3 py-1.5 rounded-inputs border border-[#ececec] text-xs bg-white text-[#17191c] focus:outline-none focus:border-[#17191c]"
+              >
+                <option value="">— Select a registered pet —</option>
+                {petsList.map(p => (
+                  <option key={p.pet_id} value={p.pet_id}>
+                    {p.avatar_emoji || "🐾"} {p.name} ({p.species_name}, {p.weight_kg}kg, {p.activity_level})
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Species */}
           <div className="space-y-1">
@@ -505,6 +585,48 @@ export default function MealPlanner({ species }) {
                 <div className="text-[10px] text-[#a3a6af] font-sans">{c.sub}</div>
               </div>
             ))}
+          </div>
+
+          {/* Save to Pet Profile Card */}
+          <div className="p-5 rounded-cards bg-[#fafafb] border border-[#ececec] flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🐾</span>
+                <h4 className="font-serif text-base text-[#17191c] font-medium">
+                  {selectedPetId
+                    ? `Save Formulation to ${petsList.find(p => p.pet_id === parseInt(selectedPetId))?.name}'s Profile`
+                    : "Save to Registered Pet Profile"}
+                </h4>
+              </div>
+              <p className="text-xs text-[#777b86]">
+                Directly saves this computed portion breakdown as the pet's active feeding regimen in their clinical care profile.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              {!selectedPetId && (
+                <select
+                  onChange={e => handleSelectPet(e.target.value)}
+                  className="px-3 py-2 rounded-inputs border border-[#ececec] text-xs bg-white text-[#17191c] focus:outline-none focus:border-[#17191c]"
+                >
+                  <option value="">— Select Target Pet —</option>
+                  {petsList.map(p => (
+                    <option key={p.pet_id} value={p.pet_id}>
+                      {p.name} ({p.species_name})
+                    </option>
+                  ))}
+                </select>
+              )}
+
+              <button
+                type="button"
+                onClick={handleSavePlanToPet}
+                disabled={saveStatus === "saving" || !selectedPetId}
+                className="btn-pill-filled text-xs py-2 px-5 whitespace-nowrap w-full sm:w-auto"
+              >
+                {saveStatus === "saving" ? "Saving..." : saveStatus === "saved" ? "✓ Saved as Active Diet!" : "Save as Active Diet →"}
+              </button>
+            </div>
           </div>
 
           {/* Day-by-Day Cards */}

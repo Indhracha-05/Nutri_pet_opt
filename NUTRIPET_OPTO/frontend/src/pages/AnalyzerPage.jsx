@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import InputForm from '../components/InputForm';
 import AnalysisResult from '../components/AnalysisResult';
 import CategoryResult from '../components/CategoryResult';
 import MealPlanner from '../components/MealPlanner';
+import NotificationCenter from '../components/NotificationCenter';
 
 const API_BASE = "http://localhost:8000";
 
@@ -15,7 +16,8 @@ const TABS = [
 
 function AnalyzerPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("analysis");
+  const [searchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState(searchParams.get("tab") || "analysis");
   const [species, setSpecies] = useState([]);
 
   const [result, setResult] = useState(null);
@@ -80,25 +82,37 @@ function AnalyzerPage() {
             </span>
           </div>
 
-          {/* Pill Tab Switcher */}
-          <div className="flex items-center gap-2 bg-[#f2f2f3] p-1 rounded-full">
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  id={`tab-${tab.id}`}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-5 py-2 text-xs font-sans rounded-full transition-all ${
-                    isActive
-                      ? "bg-[#17191c] text-[#ffffff]"
-                      : "text-[#777b86] hover:text-[#17191c]"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
+          {/* Header Action & Pill Tab Switcher */}
+          <div className="flex items-center gap-3">
+            <NotificationCenter />
+
+            <button
+              onClick={() => navigate('/pets')}
+              className="px-4 py-2 text-xs font-sans rounded-full border border-[#ececec] text-[#17191c] hover:bg-[#fafafb] transition-all flex items-center gap-1.5"
+            >
+              <span>🐾</span>
+              <span>Pet Profiles & Care</span>
+            </button>
+
+            <div className="flex items-center gap-2 bg-[#f2f2f3] p-1 rounded-full">
+              {TABS.map((tab) => {
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    id={`tab-${tab.id}`}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-5 py-2 text-xs font-sans rounded-full transition-all ${
+                      isActive
+                        ? "bg-[#17191c] text-[#ffffff]"
+                        : "text-[#777b86] hover:text-[#17191c]"
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </header>
